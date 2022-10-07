@@ -1,31 +1,40 @@
 package com.application.javagame;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.application.javagame.Managers.Assets;
+import com.application.javagame.Screens.PlayScreen;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
 
-public class MyGame extends ApplicationAdapter {
+public class MyGame extends Game {
+
+	Screen screen;
 	SpriteBatch batch;
-	Texture img;
-	
+
 	@Override
-	public void create () {
+	public void create() {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		screen = new PlayScreen(this);
+		setScreen(screen);
+
+		AssetManager manager = Assets.getManager();
+		manager.load("snake.jpg", Texture.class);
 	}
 
 	@Override
-	public void render () {
-		ScreenUtils.clear(1, 0, 0, 1);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+	public void dispose() {
+		super.dispose();
 	}
-	
+
 	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
+	public void render() {
+		super.render();
 	}
+
+	public SpriteBatch getBatch() {
+		return batch;
+	}
+
 }
