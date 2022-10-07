@@ -4,7 +4,14 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class InputManager implements Disposable {
 
-    public InputManager() {
+    private static InputManager manager;
+
+    private InputManager() {
+    }
+
+    public static InputManager getManager() {
+        if(manager == null) manager = new InputManager();
+        return manager;
     }
 
     @Override
