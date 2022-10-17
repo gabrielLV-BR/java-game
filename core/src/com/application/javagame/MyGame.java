@@ -7,12 +7,12 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 
 public class MyGame extends Game {
 
 	Screen screen;
-	SpriteBatch batch;
+	ModelBatch batch;
 
 	AssetManager assetManager;
 	InputManager inputManager;
@@ -24,13 +24,13 @@ public class MyGame extends Game {
 
 		inputManager = InputManager.getManager();
 
-		batch = new SpriteBatch();
+		batch = new ModelBatch();
 
 		screen = new PlayScreen(this);
 		setScreen(screen);
 	}
 
-	public SpriteBatch getBatch() {
+	public ModelBatch getBatch() {
 		return batch;
 	}
 

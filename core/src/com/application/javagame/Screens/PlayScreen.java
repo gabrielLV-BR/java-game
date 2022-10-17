@@ -8,11 +8,14 @@ import com.application.javagame.MyGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.sun.org.apache.xpath.internal.operations.Or;
+
+import java.util.ArrayList;
 
 public class PlayScreen implements Screen {
 
@@ -20,30 +23,60 @@ public class PlayScreen implements Screen {
     private AssetManager manager;
     private MyGame game;
 
-    private SpriteBatch spriteBatch;
+    private ModelBatch modelBatch;
+    private ModelBuilder modelBuilder;
+    private ArrayList<Model> models;
+    private ArrayList<ModelInstance> instances;
 
-    private OrthographicCamera camera;
+    private Environment environment;
+    private PerspectiveCamera camera;
     private FitViewport viewport;
 
     Player player;
 
     public PlayScreen(MyGame game) {
+        models = new ArrayList<>();
+        instances = new ArrayList<>();
+
         this.game = game;
 
         input = InputManager.getManager();
         manager = Assets.getManager();
 
-        spriteBatch = game.getBatch();
+        modelBatch = game.getBatch();
 
         player = new Player();
 
-        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera = new PerspectiveCamera(
+            90.0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()
+        );
+        camera.position.z = -5;
+        camera.lookAt(0, 0, 0);
         viewport = new FitViewport(Constantes.LARGURA, Constantes.ALTURA, camera);
+
+        environment = new Environment();
+        environment.set(ColorAttribute.createAmbient(1, 1, 1, 1));
+
+        loadLevel();
+    }
+
+    private void loadLevel() {
+        modelBuilder = new ModelBuilder();
+        Model model = modelBuilder.createBox(
+                2, 2, 2, new Material(
+                        ColorAttribute.createDiffuse(1, 0, 0, 1)
+                ),
+            VertexAttributes.Usage.Position|VertexAttributes.Usage.Normal
+        );
+
+        ModelInstance instance = new ModelInstance(model, 0, 0, 0);
+
+        models.add(model);
+        instances.add(instance);
     }
 
     private void update(float delta) {
         player.update(delta);
-        spriteBatch.setTransformMatrix(camera.combined);
     }
 
     @Override
@@ -51,9 +84,16 @@ public class PlayScreen implements Screen {
         this.update(delta);
 
         ScreenUtils.clear(0, 0, 0, 1);
-        spriteBatch.begin();
-            player.draw(spriteBatch);
-        spriteBatch.end();
+        camera.update();
+        modelBatch.begin(camera);
+//            player.draw(modelBatch, environment);
+
+            for(ModelInstance instance : instances) {
+                modelBatch.render(instance, environment);
+            }
+
+        modelBatch.end();
+
     }
 
     @Override
@@ -69,5 +109,10 @@ public class PlayScreen implements Screen {
     @Override
     public void dispose() {
         input.dispose();
+        player.dispose();
+
+        for (Model model: models) {
+            model.dispose();
+        }
     }
 }
