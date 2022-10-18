@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
-public class Player extends Entity implements Disposable {
+public class Player implements Disposable {
 
     // ModelBuilder modelBuilder;
 
@@ -19,29 +19,34 @@ public class Player extends Entity implements Disposable {
     // ModelInstance instance;
 
     public Player() {
-        position = new Vector3(Constantes.ALTURA / 2.0f, Constantes.LARGURA / 2.0f, 0);
+//        position = new Vector3(Constantes.ALTURA / 2.0f, Constantes.LARGURA / 2.0f, 0);
 
-        AssetManager manager = Assets.getManager();
-        manager.finishLoadingAsset("snake.jpg");
-        Texture texture = manager.get("snake.jpg");
+//        AssetManager manager = Assets.getManager();
+//        manager.finishLoadingAsset("snake.jpg");
+//        Texture texture = manager.get("snake.jpg");
 
-        sprite = new Sprite(texture);
-        sprite.setScale(25);
+//        sprite = new Sprite(texture);
+//        sprite.setScale(25);
 
-        createModel();
-    }
-
-    private void createModel() {
-        // modelBuilder = new ModelBuilder();
-    }
-
-    @Override
-    public void update(float delta) {
-        position.x += delta * 5000;
+//        createModel();
     }
 
     @Override
     public void dispose() {
-        // model.dispose();
+
     }
+
+//    private void createModel() {
+//        // modelBuilder = new ModelBuilder();
+//    }
+//
+//    @Override
+//    public void update(float delta) {
+//        position.x += delta * 5000;
+//    }
+//
+//    @Override
+//    public void dispose() {
+//        // model.dispose();
+//    }
 }

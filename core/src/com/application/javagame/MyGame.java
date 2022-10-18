@@ -1,17 +1,15 @@
 package com.application.javagame;
 
-import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Screens.PlayScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 
 public class MyGame extends Game {
 
-	Screen screen;
+	PlayScreen screen;
 	ModelBatch batch;
 
 	AssetManager assetManager;
@@ -19,15 +17,17 @@ public class MyGame extends Game {
 
 	@Override
 	public void create() {
-		assetManager = Assets.getManager();
-		assetManager.load("snake.jpg", Texture.class);
+		System.out.println("Created");
 
 		inputManager = InputManager.getManager();
 
 		batch = new ModelBatch();
 
+		System.out.println("Before Screen");
 		screen = new PlayScreen(this);
+		System.out.println("Set screen");
 		setScreen(screen);
+		System.out.println("PENIS");
 	}
 
 	public ModelBatch getBatch() {

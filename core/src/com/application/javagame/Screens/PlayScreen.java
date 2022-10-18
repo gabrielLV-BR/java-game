@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -25,75 +26,66 @@ public class PlayScreen implements Screen {
 
     private ModelBatch modelBatch;
     private ModelBuilder modelBuilder;
-    private ArrayList<Model> models;
-    private ArrayList<ModelInstance> instances;
+    Model model;
+    ModelInstance instance;
 
     private Environment environment;
     private PerspectiveCamera camera;
     private FitViewport viewport;
 
-    Player player;
-
     public PlayScreen(MyGame game) {
-        models = new ArrayList<>();
-        instances = new ArrayList<>();
-
         this.game = game;
 
-        input = InputManager.getManager();
-        manager = Assets.getManager();
+//        input = InputManager.getManager();
+//        manager = Assets.getManager();
 
         modelBatch = game.getBatch();
 
-        player = new Player();
+//        player = new Player();
 
         camera = new PerspectiveCamera(
             90.0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()
         );
-        camera.position.z = -5;
+        camera.near = 0.01f;
+        camera.far = 1000;
+        camera.position.set(0, 0, -10);
         camera.lookAt(0, 0, 0);
-        viewport = new FitViewport(Constantes.LARGURA, Constantes.ALTURA, camera);
+        camera.update(true);
+
+        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 
         environment = new Environment();
         environment.set(ColorAttribute.createAmbient(1, 1, 1, 1));
 
-        loadLevel();
-    }
-
-    private void loadLevel() {
         modelBuilder = new ModelBuilder();
-        Model model = modelBuilder.createBox(
-                2, 2, 2, new Material(
-                        ColorAttribute.createDiffuse(1, 0, 0, 1)
-                ),
+        model = modelBuilder.createBox(
+            3f, 3f, 3f,
+            new Material(ColorAttribute.createDiffuse(Color.GREEN)),
             VertexAttributes.Usage.Position|VertexAttributes.Usage.Normal
         );
+        instance = new ModelInstance(model);
 
-        ModelInstance instance = new ModelInstance(model, 0, 0, 0);
-
-        models.add(model);
-        instances.add(instance);
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     private void update(float delta) {
-        player.update(delta);
+//        player.update(delta);
     }
 
     @Override
     public void render(float delta) {
-        this.update(delta);
+//        this.update(delta);
+        instance.transform.rotate(Vector3.X, (float) Math.sin(delta) / 2 + 1);
+        instance.transform.rotate(Vector3.Y, delta);
 
-        ScreenUtils.clear(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
         camera.update();
         modelBatch.begin(camera);
-//            player.draw(modelBatch, environment);
 
-            for(ModelInstance instance : instances) {
-                modelBatch.render(instance, environment);
-            }
+        modelBatch.render(instance);
 
         modelBatch.end();
-
     }
 
     @Override
@@ -108,11 +100,11 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-        input.dispose();
-        player.dispose();
+//        input.dispose();
+//        player.dispose();
 
-        for (Model model: models) {
-            model.dispose();
-        }
+//        for (Model model: models) {
+//            model.dispose();
+//        }
     }
 }
