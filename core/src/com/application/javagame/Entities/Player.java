@@ -1,52 +1,36 @@
 package com.application.javagame.Entities;
 
-import com.application.javagame.Globals.Constantes;
-import com.application.javagame.Managers.Assets;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g3d.Model;
+import com.application.javagame.GameState;
+import com.application.javagame.Managers.ModelManager;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Disposable;
 
-public class Player implements Disposable {
+public class Player extends Entity {
 
-    // ModelBuilder modelBuilder;
+    ModelInstance instance;
+    PerspectiveCamera olho;
 
-    // Model model;
-    // ModelInstance instance;
+    public Player(GameState state) {
+        super(Vector3.Zero);
+        instance = ModelManager.GetInstance("player.obj", Vector3.Zero);
 
-    public Player() {
-//        position = new Vector3(Constantes.ALTURA / 2.0f, Constantes.LARGURA / 2.0f, 0);
-
-//        AssetManager manager = Assets.getManager();
-//        manager.finishLoadingAsset("snake.jpg");
-//        Texture texture = manager.get("snake.jpg");
-
-//        sprite = new Sprite(texture);
-//        sprite.setScale(25);
-
-//        createModel();
+        olho = state.getCamera();
+        olho.position.set(0, 0, 10);
+        olho.lookAt(0, 0, 0);
     }
 
     @Override
-    public void dispose() {
-
+    public void update(GameState state) {
     }
 
-//    private void createModel() {
-//        // modelBuilder = new ModelBuilder();
-//    }
-//
-//    @Override
-//    public void update(float delta) {
-//        position.x += delta * 5000;
-//    }
-//
-//    @Override
-//    public void dispose() {
-//        // model.dispose();
-//    }
+
+    @Override
+    public void draw(ModelBatch batch, Environment environment) {
+        batch.render(instance, environment);        
+    }
+
+    @Override public void dispose() {}
 }

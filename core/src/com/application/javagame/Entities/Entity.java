@@ -1,19 +1,16 @@
 package com.application.javagame.Entities;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.application.javagame.GameState;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
 
-public class Entity {
+public abstract class Entity implements Disposable {
     public Vector3 position;
-    Sprite sprite;
 
-    public void update(float delta) {}
+    Entity(Vector3 p) { position = p; }
 
-    public void draw(ModelBatch batch, Environment environment) {
-        sprite.setPosition(position.x, position.y);
-        sprite.draw((Batch) batch);
-    }
+    public abstract void update(GameState state);
+    public abstract void draw(ModelBatch batch, Environment environment);
 }

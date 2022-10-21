@@ -8,20 +8,32 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class InputManager implements Disposable, InputProcessor {
 
-    private static InputManager manager;
-
     private Vector2 movement;
+    private Vector2 mouseDelta;
     boolean usandoControle = false;
 
-    private InputManager() {
+    private Vector2 _prevMousePos;
+
+    public InputManager() {
+        movement = new Vector2();
+        mouseDelta = new Vector2();
+        usandoControle = false;
+
+        _prevMousePos = new Vector2(0, 0);
+
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void dispose() {
+        Gdx.input.setInputProcessor(null);
     }
 
     // Getters
+
+    public Vector2 getMouseDelta() {
+        return mouseDelta;
+    }
 
     public Vector2 getMovimento() {
         return movement.nor();
@@ -29,13 +41,6 @@ public class InputManager implements Disposable, InputProcessor {
 
     public boolean estaUsandoControle() {
         return usandoControle;
-    }
-
-    // Singleton
-
-    public static InputManager getManager() {
-        if(manager == null) manager = new InputManager();
-        return manager;
     }
 
     // Teclado/Mouse
@@ -65,6 +70,15 @@ public class InputManager implements Disposable, InputProcessor {
     }
 
     @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        mouseDelta.x = screenX - _prevMousePos.x;
+        mouseDelta.y = screenY - _prevMousePos.y;
+        _prevMousePos.set(screenX, screenY);
+        
+        return true;
+    }
+
+    @Override
     public boolean keyTyped(char character) {
         return false;
     }
@@ -81,11 +95,6 @@ public class InputManager implements Disposable, InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
 
