@@ -3,8 +3,11 @@ package com.application.javagame;
 import java.util.ArrayList;
 
 import com.application.javagame.Entities.Entity;
+import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.ModelManager;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -20,6 +23,11 @@ public class GameState implements Disposable {
     public GameState(MyGame g) {
         ModelManager.Initialize();
 
+//        AssetManager manager = Assets.GetManager();
+//        manager.load("player.obj", Model.class);
+//
+//        ModelManager.Store("player.obj", "player.obj");
+
         game = g;
         delta = 0;
         entities = new ArrayList<>();
@@ -29,6 +37,7 @@ public class GameState implements Disposable {
         camera.far = 1000;
         camera.near = 0.001f;
         camera.fieldOfView = 90;
+        camera.update();
     }
 
     public MyGame getGame() {
