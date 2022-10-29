@@ -1,73 +1,108 @@
 package com.application.javagame.Screens;
 
-import com.application.javagame.GameState;
-import com.application.javagame.Entities.Entity;
 import com.application.javagame.Entities.Player;
-import com.application.javagame.Managers.Assets;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 
-public class PlayScreen implements Screen {
+public class PlayScreen implements InputProcessor, Screen {
 
-    private ModelBatch modelBatch;
-    private Environment environment;
+    private final ModelBatch modelBatch;
+    private final Environment environment;
+    Player player;
 
-    GameState state;
-
-    public PlayScreen(GameState state) {
-        AssetManager assetManager = Assets.GetManager();
-        assetManager.load("player.obj", Model.class);
-
-        this.state = state;
-
-        state.entities.add(new Player(state));
-
-        modelBatch = state.getBatch();
+    public PlayScreen () {
+        modelBatch = new ModelBatch();
 
         environment = new Environment();
-        environment.set(ColorAttribute.createAmbient(1, 1, 1, 1));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight,0.8f,0.8f,0.8f,1f));
 
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    }
+        player = new Player();
 
-    private void update() {
-        for(Entity e : state.entities) {
-            e.update(state);
-        }
+        Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render(float delta) {
-        state.delta = delta;
-        update();
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT|GL20.GL_DEPTH_BUFFER_BIT);
 
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-        modelBatch.begin(state.getCamera());
-
-        for (Entity entity : state.entities) {
-            entity.draw(modelBatch, environment);
-        }
-
+        modelBatch.begin(player.getCamera());
+        player.draw(modelBatch, environment);
         modelBatch.end();
     }
 
-    @Override public void show() { }
-    @Override public void pause() { }
-    @Override public void resume() { }
-    @Override public void hide() { }
-    @Override public void resize(int width, int height) { }
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
 
     @Override
     public void dispose() {
-        for (Entity entity : state.entities) {
-            entity.dispose();
-        }
+
     }
 }

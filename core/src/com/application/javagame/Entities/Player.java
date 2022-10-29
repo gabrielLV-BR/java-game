@@ -1,60 +1,47 @@
 package com.application.javagame.Entities;
 
 import com.application.javagame.GameState;
-import com.application.javagame.Managers.Assets;
-import com.application.javagame.Managers.InputManager;
-import com.application.javagame.Managers.ModelManager;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class Player extends Entity {
 
-    InputManager inputManager;
+    Model model;
     ModelInstance instance;
-    PerspectiveCamera olho;
+    PerspectiveCamera camera;
 
-    public Player(GameState state) {
+    public Player() {
         super(Vector3.Zero);
 
-        inputManager = new InputManager();
+        camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        camera.position.set(0f, 0f, 3f);
+        camera.lookAt(0f,0f,0f);
+        camera.near =0.1f;
+        camera.far = 300f;
 
         ObjLoader loader = new ObjLoader();
-        Model model = loader.loadModel(Gdx.files.internal("player.obj"));
-        instance = new ModelInstance(model, Vector3.Zero);
+        model = loader.loadModel(Gdx.files.internal("player.obj"));
+        instance = new ModelInstance(model,0,0,0);
+    }
 
-        olho = state.getCamera();
-        olho.position.set(0, 0, -10);
-        olho.lookAt(0, 0, 0);
-        olho.update();
+    public PerspectiveCamera getCamera() {
+        return camera;
     }
 
     @Override
     public void update(GameState state) {
-        Vector2 input = inputManager.getMovimento();
-        Vector3 movimento = new Vector3(
-                input.x, 0, input.y
-        );
-
-        System.out.println("Posição: (" + olho.position.x + ", " + olho.position.z + ")");
-        olho.position.add(movimento);
-        olho.update();
     }
 
     @Override
     public void draw(ModelBatch batch, Environment environment) {
-        batch.render(instance, environment);        
+        camera.update();
+        batch.render(instance, environment);
     }
 
     @Override public void dispose() {
-        inputManager.dispose();
+        model.dispose();
     }
 }
