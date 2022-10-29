@@ -4,20 +4,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
 public class InputManager implements Disposable, InputProcessor {
 
-    private Vector2 movement;
+    private Vector3 movement;
     private Vector2 mouseDelta;
-    boolean usandoControle = false;
+
+    boolean usingController = false;
+    boolean mouseMoved = false;
 
     private Vector2 _prevMousePos;
 
     public InputManager() {
-        movement = new Vector2();
+        movement = new Vector3();
         mouseDelta = new Vector2();
-        usandoControle = false;
+        usingController = false;
 
         _prevMousePos = new Vector2(0, 0);
 
@@ -32,25 +35,34 @@ public class InputManager implements Disposable, InputProcessor {
     // Getters
 
     public Vector2 getMouseDelta() {
-        return mouseDelta;
+        if(mouseMoved)
+            return mouseDelta;
+        return Vector2.Zero;
     }
 
-    public Vector2 getMovimento() {
+    public Vector3 getMovement() {
         return movement.nor();
     }
 
-    public boolean estaUsandoControle() {
-        return usandoControle;
+    public Vector2 getMousePosition() {
+        return _prevMousePos;
+    }
+
+    public boolean isUsingController() {
+        return usingController;
     }
 
     // Teclado/Mouse
 
     @Override
     public boolean keyDown(int keycode) {
+        if(keycode == Input.Keys.ESCAPE) {
+            Gdx.input.setCursorCatched(false);
+        }
         switch (keycode) {
-            case Input.Keys.W: movement.y =  1; break;
+            case Input.Keys.W: movement.z = -1; break;
             case Input.Keys.A: movement.x = -1; break;
-            case Input.Keys.S: movement.y = -1; break;
+            case Input.Keys.S: movement.z =  1; break;
             case Input.Keys.D: movement.x =  1; break;
         }
         return true;
@@ -61,7 +73,7 @@ public class InputManager implements Disposable, InputProcessor {
         switch (keycode) {
             case Input.Keys.W:
             case Input.Keys.S:
-                movement.y = 0; break;
+                movement.z = 0; break;
             case Input.Keys.A:
             case Input.Keys.D:
                 movement.x = 0; break;
@@ -71,11 +83,14 @@ public class InputManager implements Disposable, InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        mouseDelta.x = screenX - _prevMousePos.x;
-        mouseDelta.y = screenY - _prevMousePos.y;
+        mouseDelta.set(screenX, screenY).sub(_prevMousePos);
         _prevMousePos.set(screenX, screenY);
-        
+        mouseMoved = true;
         return true;
+    }
+
+    public void update() {
+        mouseMoved = false;
     }
 
     @Override
@@ -85,7 +100,8 @@ public class InputManager implements Disposable, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
+        Gdx.input.setCursorCatched(true);
+        return true;
     }
 
     @Override

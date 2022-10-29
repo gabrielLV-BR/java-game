@@ -1,108 +1,58 @@
 package com.application.javagame.Screens;
 
+import com.application.javagame.Entities.Entity;
 import com.application.javagame.Entities.Player;
+import com.application.javagame.GameState;
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 
-public class PlayScreen implements InputProcessor, Screen {
+public class PlayScreen implements Screen {
 
     private final ModelBatch modelBatch;
     private final Environment environment;
-    Player player;
 
-    public PlayScreen () {
+    private GameState state;
+
+    public PlayScreen(GameState state) {
+        this.state = state;
+        this.state.player = new Player();
+
         modelBatch = new ModelBatch();
 
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight,0.8f,0.8f,0.8f,1f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 0.8f, 1f));
+    }
 
-        player = new Player();
-
-        Gdx.input.setInputProcessor(this);
+    public void update() {
+        state.player.update(state);
+        for (Entity e: state.entities) {
+            e.update(state);
+        }
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT|GL20.GL_DEPTH_BUFFER_BIT);
+        state.delta = delta;
+        update();
 
-        modelBatch.begin(player.getCamera());
-        player.draw(modelBatch, environment);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+        modelBatch.begin(state.player.getCamera());
+        state.player.draw(modelBatch, environment);
         modelBatch.end();
     }
 
-    @Override
-    public boolean keyDown(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        return false;
-    }
-
-    @Override
-    public void show() {
+    @Override public void show() {
 
     }
-
-
-
-    @Override
-    public void resize(int width, int height) {
-
-    }
-
-    @Override
-    public void pause() {
+    @Override public void hide() {}
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void resize(int width, int height) {
 
     }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-
-    }
+    @Override public void dispose() {}
 }
