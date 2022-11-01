@@ -18,7 +18,7 @@ public class PlayScreen implements Screen {
 
     public PlayScreen(GameState state) {
         this.state = state;
-        this.state.player = new Player();
+        this.state.player = new Player(state);
 
         modelBatch = new ModelBatch();
 

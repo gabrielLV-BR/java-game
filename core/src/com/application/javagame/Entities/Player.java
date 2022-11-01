@@ -1,6 +1,7 @@
 package com.application.javagame.Entities;
 
 import com.application.javagame.GameState;
+import com.application.javagame.Events.MouseListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -9,7 +10,7 @@ import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-public class Player extends Entity {
+public class Player extends Entity implements MouseListener {
 
     Model model;
     ModelInstance instance;
@@ -24,13 +25,15 @@ public class Player extends Entity {
     // Valor de rotação horizontal da câmera
     float yaw;
 
-    public Player() {
+    public Player(GameState state) {
         super(Vector3.Zero);
+
+        state.getInputManager().subscribeMouseListener(this);
 
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         camera.position.set(0f, 0f, 3f);
         camera.lookAt(0f,0f,0f);
-        camera.near =0.1f;
+        camera.near = 0.1f;
         camera.far = 300f;
 
         ObjLoader loader = new ObjLoader();
@@ -96,5 +99,26 @@ public class Player extends Entity {
 
     @Override public void dispose() {
         model.dispose();
+    }
+
+    @Override
+    public void onMouseMoved(Vector2 from, Vector2 to) {
+        // TODO Auto-generated method stub
+        
+    }
+    @Override
+    public void onMouseDragged(Vector2 from, Vector2 to) {
+        // TODO Auto-generated method stub
+        
+    }
+    @Override
+    public void onMouseClicked(Vector2 where, int key, int modifiers) {
+        // TODO Auto-generated method stub
+        
+    }
+    @Override
+    public void onMouseReleased(Vector2 where, int key, int modifiers) {
+        // TODO Auto-generated method stub
+        
     }
 }

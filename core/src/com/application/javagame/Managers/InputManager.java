@@ -1,5 +1,8 @@
 package com.application.javagame.Managers;
 
+import java.util.ArrayList;
+
+import com.application.javagame.Events.MouseListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -17,19 +20,58 @@ public class InputManager implements Disposable, InputProcessor {
 
     private final Vector2 _prevMousePos;
 
+    Vector2 tmpVector;
+
+    ArrayList<MouseListener> mouseListeners;
+
     public InputManager() {
         movement = Vector3.Zero;
         mouseDelta = Vector2.Zero;
         usingController = false;
 
+        tmpVector = new Vector2();
         _prevMousePos = new Vector2(0, 0);
+
+        mouseListeners = new ArrayList<>();
 
         Gdx.input.setInputProcessor(this);
     }
 
+
     @Override
     public void dispose() {
         Gdx.input.setInputProcessor(null);
+    }
+
+    // Padrão do observador
+
+    public void subscribeMouseListener(MouseListener listener) {
+        mouseListeners.add(listener);
+    }
+
+    public void unsubscribeMouseListener(MouseListener listener) {
+        mouseListeners.remove(listener);
+    }
+
+    private void dispatchMouseClicked(Vector2 where, int pointer, int button) {
+        for(MouseListener listener : mouseListeners) {
+            listener.onMouseClicked(where, pointer, button);
+        }
+    }
+    private void dispatchMouseReleased(Vector2 where, int pointer, int button) {
+        for(MouseListener listener : mouseListeners) {
+            listener.onMouseReleased(where, pointer, button);
+        }
+    }
+    private void dispatchMouseMoved(Vector2 from, Vector2 to) {
+        for(MouseListener listener : mouseListeners) {
+            listener.onMouseMoved(from, to);
+        }
+    }
+    private void dispatchMouseDragged(Vector2 from, Vector2 to) {
+        for(MouseListener listener : mouseListeners) {
+            listener.onMouseDragged(from, to);
+        }
     }
 
     // Getters
@@ -39,7 +81,6 @@ public class InputManager implements Disposable, InputProcessor {
             this.mouseMoved = false;
             return mouseDelta;
         }
-        System.out.println("Mouse has not moved");
         return new Vector2(0, 0);
     }
 
@@ -86,6 +127,7 @@ public class InputManager implements Disposable, InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+        dispatchMouseMoved(_prevMousePos, tmpVector.set(screenX, screenY));
         mouseDelta.set(screenX, screenY).sub(_prevMousePos);
         _prevMousePos.set(screenX, screenY);
         mouseMoved = true;
@@ -103,17 +145,20 @@ public class InputManager implements Disposable, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        dispatchMouseClicked(_prevMousePos, pointer, button);
         Gdx.input.setCursorCatched(true);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        dispatchMouseReleased(tmpVector.set(screenX, screenY), pointer, button);
         return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        dispatchMouseDragged(_prevMousePos, tmpVector.set(screenX, screenY));
         return false;
     }
 
