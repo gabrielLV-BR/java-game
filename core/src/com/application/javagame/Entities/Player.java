@@ -2,19 +2,25 @@ package com.application.javagame.Entities;
 
 import com.application.javagame.GameState;
 import com.application.javagame.Events.MouseListener;
+import com.application.javagame.Managers.Assets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+
+import net.mgsx.gltf.scene3d.scene.Scene;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Player extends Entity implements MouseListener {
 
     Model model;
     ModelInstance instance;
     PerspectiveCamera camera;
+
+    GameState state;
 
     float speed;
     float mouseSensitivity;
@@ -29,6 +35,7 @@ public class Player extends Entity implements MouseListener {
         super(Vector3.Zero);
 
         state.getInputManager().subscribeMouseListener(this);
+        this.state = state;
 
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         camera.position.set(0f, 0f, 3f);
@@ -36,9 +43,10 @@ public class Player extends Entity implements MouseListener {
         camera.near = 0.1f;
         camera.far = 300f;
 
-        ObjLoader loader = new ObjLoader();
-        model = loader.loadModel(Gdx.files.internal("player.obj"));
-        instance = new ModelInstance(model,0,0,0);
+        AssetManager manager = Assets.GetManager();
+
+        manager.finishLoadingAsset("player.glb");
+        scene = new Scene(manager.get("player.glb", SceneAsset.class).scene);
 
         speed = 50f;
         mouseSensitivity = 0.7f;
@@ -92,16 +100,6 @@ public class Player extends Entity implements MouseListener {
     }
 
     @Override
-    public void draw(ModelBatch batch, Environment environment) {
-        camera.update();
-        batch.render(instance, environment);
-    }
-
-    @Override public void dispose() {
-        model.dispose();
-    }
-
-    @Override
     public void onMouseMoved(Vector2 from, Vector2 to) {
         // TODO Auto-generated method stub
         
@@ -113,8 +111,8 @@ public class Player extends Entity implements MouseListener {
     }
     @Override
     public void onMouseClicked(Vector2 where, int key, int modifiers) {
-        // TODO Auto-generated method stub
-        
+        System.out.println("Mouse clicado em " + where.toString());
+        fire(state);
     }
     @Override
     public void onMouseReleased(Vector2 where, int key, int modifiers) {

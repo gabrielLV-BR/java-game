@@ -2,7 +2,6 @@ package com.application.javagame;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.application.javagame.MyGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

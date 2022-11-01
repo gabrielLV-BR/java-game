@@ -6,13 +6,11 @@ import com.application.javagame.Entities.Player;
 import com.application.javagame.GameState;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import net.mgsx.gltf.scene3d.scene.SceneManager;
 
 public class PlayScreen implements Screen {
 
-    private final ModelBatch modelBatch;
-    private final Environment environment;
+    SceneManager sceneManager;
 
     private GameState state;
 
@@ -20,10 +18,12 @@ public class PlayScreen implements Screen {
         this.state = state;
         this.state.player = new Player(state);
 
-        modelBatch = new ModelBatch();
+        sceneManager = new SceneManager();
+        sceneManager.setCamera(this.state.player.getCamera());
+        sceneManager.setAmbientLight(0.3f);
+        sceneManager.updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 0.8f, 1f));
+        sceneManager.addScene(this.state.player.getScene(), true);
     }
 
     public void update() {
@@ -44,17 +44,9 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        modelBatch.begin(state.player.getCamera());
-
-        state.player.draw(modelBatch, environment);
-        for (Bullet b: state.bullets) {
-            b.draw(modelBatch, environment);
-        }
-        for (Entity e: state.entities) {
-            e.draw(modelBatch, environment);
-        }
-
-        modelBatch.end();
+        sceneManager.camera.update();
+        sceneManager.update(delta);
+        sceneManager.render();
     }
 
     @Override public void show() {
@@ -64,7 +56,7 @@ public class PlayScreen implements Screen {
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void resize(int width, int height) {
-
+        sceneManager.updateViewport(width, height);
     }
     @Override public void dispose() {}
 }
