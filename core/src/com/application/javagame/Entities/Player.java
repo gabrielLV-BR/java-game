@@ -14,6 +14,7 @@ public class Player extends Entity {
     ModelInstance instance;
     PerspectiveCamera camera;
 
+    float speed;
     float mouseSensitivity;
 
     // Vetor temporário pra não ficarmos instanciando um a cada update
@@ -35,6 +36,7 @@ public class Player extends Entity {
         model = loader.loadModel(Gdx.files.internal("player.obj"));
         instance = new ModelInstance(model,0,0,0);
 
+        speed = 50f;
         mouseSensitivity = 0.7f;
         yaw = 0f;
 
@@ -48,22 +50,13 @@ public class Player extends Entity {
     @Override
     public void update(GameState state) {
         rotateCamera(state);
-        Vector3 mov = state.getInputManager().getMovement();
 
-        Vector3 forward = camera.direction.cpy();
-        Vector3 right = tmpVector.set(camera.direction).crs(Vector3.Y);
+        Vector3 input = state.getInputManager().getMovement();
+        tmpVector.setZero()
+            .add(camera.direction.cpy().scl(-input.z * state.delta * speed))
+            .add(camera.direction.cpy().crs(Vector3.Y).scl(input.x * state.delta * speed));
 
-        forward.x *= mov.z;
-        forward.y *= mov.z;
-        forward.z *= mov.z;
-
-        right.x *= mov.x;
-        right.y *= mov.x;
-        right.z *= mov.x;
-
-        mov.setZero().add(forward).add(right);
-
-        camera.position.add(mov);
+        camera.position.add(tmpVector);
         state.getInputManager().update();
     }
 
@@ -75,46 +68,15 @@ public class Player extends Entity {
         Vector2 mouseDelta = state.getInputManager().getMouseDelta();
 
         float x = mouseDelta.x ;
-
-        camera.rotate(Vector3.Y,-x * mouseSensitivity);
-        yaw += -x * mouseSensitivity;
-
-        float y = - (float) Math.sin(mouseDelta.y/180f);
-        if (Math.abs(camera.direction.y + y * (mouseSensitivity*5.0f)) < Math.PI) {
-            camera.direction.y +=  y * (mouseSensitivity*5.0f) ;
+        if(x != 0) {
+            camera.rotate(Vector3.Y,-x * mouseSensitivity);
+            yaw += -x * mouseSensitivity;
         }
 
-        /*
-        * int magX = Math.abs(mouseX - screenX);
-    int magY = Math.abs(mouseY - screenY);
-
-    if (mouseX > screenX) {
-        cam.rotate(Vector3.Y, 1 * magX * rotSpeed);
-        cam.update();
-    }
-
-    if (mouseX < screenX) {
-        cam.rotate(Vector3.Y, -1 * magX * rotSpeed);
-        cam.update();
-    }
-
-    if (mouseY < screenY) {
-        if (cam.direction.y > -0.965)
-            cam.rotate(cam.direction.cpy().crs(Vector3.Y), -1 * magY * rotSpeed);
-        cam.update();
-    }
-
-    if (mouseY > screenY) {
-
-        if (cam.direction.y < 0.965)
-            cam.rotate(cam.direction.cpy().crs(Vector3.Y), 1 * magY * rotSpeed);
-        cam.update();
-    }
-
-    mouseX = screenX;
-    mouseY = screenY;
-
-    return false;*/
+        float y = - (float) Math.sin(mouseDelta.y/180f);
+        if (y != 0 && Math.abs(camera.direction.y + y * (mouseSensitivity*5.0f)) < Math.PI) {
+            camera.direction.y += y * (mouseSensitivity*5.0f) ;
+        }
     }
 
     @Override

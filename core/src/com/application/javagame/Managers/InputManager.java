@@ -9,17 +9,17 @@ import com.badlogic.gdx.utils.Disposable;
 
 public class InputManager implements Disposable, InputProcessor {
 
-    private Vector3 movement;
-    private Vector2 mouseDelta;
+    private final Vector3 movement;
+    private final Vector2 mouseDelta;
 
     boolean usingController = false;
     boolean mouseMoved = false;
 
-    private Vector2 _prevMousePos;
+    private final Vector2 _prevMousePos;
 
     public InputManager() {
-        movement = new Vector3();
-        mouseDelta = new Vector2();
+        movement = Vector3.Zero;
+        mouseDelta = Vector2.Zero;
         usingController = false;
 
         _prevMousePos = new Vector2(0, 0);
@@ -35,9 +35,12 @@ public class InputManager implements Disposable, InputProcessor {
     // Getters
 
     public Vector2 getMouseDelta() {
-        if(mouseMoved)
+        if(mouseMoved) {
+            this.mouseMoved = false;
             return mouseDelta;
-        return Vector2.Zero;
+        }
+        System.out.println("Mouse has not moved");
+        return new Vector2(0, 0);
     }
 
     public Vector3 getMovement() {
@@ -90,7 +93,7 @@ public class InputManager implements Disposable, InputProcessor {
     }
 
     public void update() {
-        mouseMoved = false;
+        this.mouseMoved = false;
     }
 
     @Override
