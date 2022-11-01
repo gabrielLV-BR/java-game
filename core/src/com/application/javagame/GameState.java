@@ -2,6 +2,7 @@ package com.application.javagame;
 
 import java.util.ArrayList;
 
+import com.application.javagame.Entities.Bullet;
 import com.application.javagame.Entities.Entity;
 import com.application.javagame.Entities.Player;
 import com.application.javagame.Managers.InputManager;
@@ -17,6 +18,7 @@ public class GameState implements Disposable {
 
     public Player player;
     public ArrayList<Entity> entities;
+    public ArrayList<Bullet> bullets;
     public float delta;
 
     public GameState(MyGame g) {
@@ -25,6 +27,7 @@ public class GameState implements Disposable {
         game = g;
         delta = 0;
         entities = new ArrayList<>();
+        bullets = new ArrayList<>();
         batch = new ModelBatch();
     }
 

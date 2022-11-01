@@ -1,5 +1,6 @@
 package com.application.javagame.Screens;
 
+import com.application.javagame.Entities.Bullet;
 import com.application.javagame.Entities.Entity;
 import com.application.javagame.Entities.Player;
 import com.application.javagame.GameState;
@@ -27,6 +28,9 @@ public class PlayScreen implements Screen {
 
     public void update() {
         state.player.update(state);
+        for (Bullet b: state.bullets) {
+            b.update(state);
+        }
         for (Entity e: state.entities) {
             e.update(state);
         }
@@ -41,7 +45,15 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(state.player.getCamera());
+
         state.player.draw(modelBatch, environment);
+        for (Bullet b: state.bullets) {
+            b.draw(modelBatch, environment);
+        }
+        for (Entity e: state.entities) {
+            e.draw(modelBatch, environment);
+        }
+
         modelBatch.end();
     }
 

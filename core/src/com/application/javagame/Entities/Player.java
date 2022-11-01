@@ -2,6 +2,7 @@ package com.application.javagame.Entities;
 
 import com.application.javagame.GameState;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
@@ -58,6 +59,9 @@ public class Player extends Entity {
 
         camera.position.add(tmpVector);
         state.getInputManager().update();
+
+        if(Gdx.input.isKeyPressed(Input.Buttons.LEFT))
+            fire(state);
     }
 
     /*
@@ -77,6 +81,11 @@ public class Player extends Entity {
         if (y != 0 && Math.abs(camera.direction.y + y * (mouseSensitivity*5.0f)) < Math.PI) {
             camera.direction.y += y * (mouseSensitivity*5.0f) ;
         }
+    }
+
+    void fire(GameState state) {
+        System.out.println("Fogo!");
+        state.bullets.add(new Bullet(position, camera.direction, 20));
     }
 
     @Override
