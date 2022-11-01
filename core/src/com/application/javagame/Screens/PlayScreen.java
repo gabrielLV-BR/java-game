@@ -10,18 +10,15 @@ import net.mgsx.gltf.scene3d.scene.SceneManager;
 
 public class PlayScreen implements Screen {
 
-    SceneManager sceneManager;
-
+    private SceneManager sceneManager;
     private GameState state;
 
     public PlayScreen(GameState state) {
         this.state = state;
         this.state.player = new Player(state);
 
-        sceneManager = new SceneManager();
+        sceneManager = this.state.getSceneManager();
         sceneManager.setCamera(this.state.player.getCamera());
-        sceneManager.setAmbientLight(0.3f);
-        sceneManager.updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         sceneManager.addScene(this.state.player.getScene(), true);
     }

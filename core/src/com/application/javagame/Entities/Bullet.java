@@ -17,11 +17,10 @@ public class Bullet extends Entity {
         super(position);
         this.direction = direction.nor().cpy().scl(speed);
 
-
         AssetManager assetManager = Assets.GetManager();
 
-        assetManager.finishLoadingAsset("player.glb");
-        scene = new Scene(assetManager.get("player.glb", SceneAsset.class).scene);
+        assetManager.finishLoadingAsset("bullet.gltf");
+        scene = new Scene(assetManager.get("bullet.gltf", SceneAsset.class).scene);
 
         tmpVec = new Vector3();
     }

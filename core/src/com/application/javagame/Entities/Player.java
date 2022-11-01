@@ -96,7 +96,9 @@ public class Player extends Entity implements MouseListener {
 
     void fire(GameState state) {
         System.out.println("Fogo!");
-        state.bullets.add(new Bullet(position, camera.direction, 20));
+        Bullet bullet = new Bullet(camera.position.cpy(), camera.direction.cpy(), 20);
+        state.bullets.add(bullet);
+        state.getSceneManager().addScene(bullet.getScene());
     }
 
     @Override
