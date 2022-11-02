@@ -1,6 +1,7 @@
 package com.application.javagame.Objects.Entities;
 
 import com.application.javagame.GameState;
+import com.application.javagame.Globals.Actions;
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
@@ -13,7 +14,6 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Player extends GameObject {
 
-    GameState state;
     PerspectiveCamera camera;
 
     float speed; // velocidade
@@ -46,19 +46,28 @@ public class Player extends GameObject {
     public void update(GameState state) {
         rotateCamera();
 
-        Vector3 input = InputManager.getInputManager().getMovement();
-
-        tmpVector.setZero()
-            .add(camera.direction.cpy().scl(-input.z * state.delta * speed))
-            .add(camera.direction.cpy().crs(Vector3.Y).scl(input.x * state.delta * speed));
-
-        camera.position.add(tmpVector);
+        move(state.delta);
 
         if(InputManager.getInputManager().getMouseState().button == Input.Buttons.LEFT)
             fire(state);
 
         System.out.println("Camera position: (" + camera.position.x + ", " + camera.position.y + ")");
     }
+
+    private void move(float delta) {
+        InputManager inMan = InputManager.getInputManager();
+
+        Vector3 input = tmpVector.set(
+            inMan.keyStrength(Actions.Player.RIGHT) - inMan.keyStrength(Actions.Player.LEFT),
+            0,
+            inMan.keyStrength(Actions.Player.BACKWARD) - inMan.keyStrength(Actions.Player.FORWARD)
+        );
+
+        camera.position
+            .add(camera.direction.cpy().scl(-input.z * delta * speed))
+            .add(camera.direction.cpy().crs(Vector3.Y).scl(input.x * delta * speed));
+    }
+
 
     /*
         Código base pego daqui -> https://stackoverflow.com/a/34058580
@@ -83,8 +92,5 @@ public class Player extends GameObject {
         System.out.println("Fogo!");
         Bullet bullet = new Bullet(camera.position.cpy(), camera.direction.cpy(), 20);
         state.addGameObject(bullet);
-        //TODO: Lide com isso
-//        state.gameObjects.add(bullet);
-//        state.getSceneManager().addScene(bullet.getScene());
     }
 }

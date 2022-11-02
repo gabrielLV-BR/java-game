@@ -1,22 +1,23 @@
 package com.application.javagame.Managers;
 
 import com.application.javagame.Data.MouseState;
+import com.application.javagame.Globals.Actions;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
-//TODO: Guardar estados das teclas importantes
+import java.util.HashMap;
+
 public class InputManager implements Disposable, InputProcessor {
 
     private final MouseState mouseState;
-    private final Vector3 movement;
     boolean usingController = false;
 
+    private final HashMap<Integer, Float> inputMap;
+
     // Auxiliares
-    private final Vector2 tmpVector;
     private final Vector2 prevMousePosition;
     private boolean mouseMoved = false;
 
@@ -24,10 +25,15 @@ public class InputManager implements Disposable, InputProcessor {
 
     private InputManager() {
         mouseState = new MouseState();
-        movement = new Vector3();
-        usingController = false;
+        inputMap = new HashMap<>();
 
-        tmpVector = new Vector2();
+        // Guardando as ações possíveis
+        for(int button : Actions.Player.getButtons()) {
+            inputMap.put(button, 0f);
+        }
+        //
+
+        usingController = false;
         prevMousePosition = new Vector2(0, 0);
     }
 
@@ -47,6 +53,10 @@ public class InputManager implements Disposable, InputProcessor {
 
     // Getters
 
+    public float keyStrength(int key) {
+        return inputMap.get(key);
+    }
+
     public MouseState getMouseState() {
         if(!mouseMoved) {
             mouseState.delta.setZero();
@@ -58,36 +68,23 @@ public class InputManager implements Disposable, InputProcessor {
         return usingController;
     }
 
-    //TODO: Remover isso daqui e colocar dentro do player
-    public Vector3 getMovement() {
-        return movement.nor();
-    }
     // Teclado/Mouse
-
     @Override
     public boolean keyDown(int keycode) {
         if(keycode == Input.Keys.ESCAPE) {
             Gdx.input.setCursorCatched(false);
         }
-        switch (keycode) {
-            case Input.Keys.W: movement.z = -1; break;
-            case Input.Keys.A: movement.x = -1; break;
-            case Input.Keys.S: movement.z =  1; break;
-            case Input.Keys.D: movement.x =  1; break;
-        }
+
+        if(inputMap.containsKey(keycode))
+            inputMap.put(keycode, 1f);
+
         return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        switch (keycode) {
-            case Input.Keys.W:
-            case Input.Keys.S:
-                movement.z = 0; break;
-            case Input.Keys.A:
-            case Input.Keys.D:
-                movement.x = 0; break;
-        }
+        if(inputMap.containsKey(keycode))
+            inputMap.put(keycode, 0f);
         return true;
     }
 
