@@ -2,15 +2,14 @@ package com.application.javagame;
 
 import java.util.ArrayList;
 
-import com.application.javagame.Entities.Bullet;
-import com.application.javagame.Entities.Entity;
-import com.application.javagame.Entities.Player;
+import com.application.javagame.Objects.Entities.Bullet;
+import com.application.javagame.Objects.Entities.Player;
+import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Managers.Assets;
-import com.application.javagame.Managers.InputManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
@@ -21,30 +20,58 @@ import net.mgsx.gltf.scene3d.scene.SceneManager;
 
 public class GameState implements Disposable {
 
-    private InputManager inputManager;
-    private MyGame game;
-    private ModelBatch batch;
+    private final SceneManager sceneManager;
+    public final ArrayList<GameObject> gameObjects;
+    private final ArrayList<GameObject> gameObjectsPool;
 
-    private SceneManager sceneManager;
-
-    public Player player;
-    public ArrayList<Entity> entities;
-    public ArrayList<Bullet> bullets;
     public float delta;
 
-    public GameState(MyGame g) {
-        inputManager = new InputManager();
-        game = g;
+    public GameState() {
         delta = 0;
-        entities = new ArrayList<>();
-        bullets = new ArrayList<>();
-        batch = new ModelBatch();
+        gameObjects = new ArrayList<>();
+        gameObjectsPool = new ArrayList<>();
+
+        preloadAssets();
 
         sceneManager = new SceneManager();
         sceneManager.setAmbientLight(0.3f);
         sceneManager.updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        preloadAssets();
+        Player player = new Player();
+        sceneManager.setCamera(player.getCamera());
+
+        addGameObject(player);
+        addGameObject(new Bullet(new Vector3(0, 0, 10), Vector3.Zero, 0));
+    }
+
+    public void addGameObject(GameObject object) {
+        gameObjectsPool.add(object);
+        sceneManager.addScene(object);
+    }
+
+    public void update(float delta) {
+        this.delta = delta;
+
+        if(!gameObjectsPool.isEmpty()) {
+            gameObjects.addAll(gameObjectsPool);
+            gameObjectsPool.clear();
+        }
+
+        for (GameObject object : gameObjects) {
+            object.update(this);
+        }
+    }
+
+    public void render() {
+        Gdx.gl20.glClearColor(0, 0, 0, 1);
+        Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        sceneManager.camera.update();
+        sceneManager.update(delta);
+        sceneManager.render();
+    }
+
+    public void resize(int width, int height) {
+        sceneManager.updateViewport(width, height);
     }
 
     private void preloadAssets() {
@@ -54,31 +81,10 @@ public class GameState implements Disposable {
         manager.load("player.glb", SceneAsset.class);
         manager.load("bullet.gltf", SceneAsset.class);
     }
-    
-    public SceneManager getSceneManager() {
-        return sceneManager;
-    }
-
-    public MyGame getGame() {
-        return game;
-    }
-
-    public InputManager getInputManager() {
-        return inputManager;
-    }
-
-    public ModelBatch getBatch() {
-        return batch;
-    }
 
     @Override public void dispose() {
-        game = null;
-        inputManager.dispose();
-        batch.dispose();
-        player.dispose();
-
-        for (Entity e: entities) {
-            e.dispose();
+        for(GameObject object : gameObjects) {
+            object.dispose();
         }
     }
 }

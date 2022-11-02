@@ -5,13 +5,17 @@ import com.badlogic.gdx.assets.AssetManager;
 public class Assets {
     private static AssetManager manager = null;
 
-    private static void Initialize() {
+    public static void Initialize() {
         manager = new AssetManager();
     }
 
     public static AssetManager GetManager() {
-        if(Assets.manager == null) Initialize();
         return Assets.manager;
+    }
+
+    public static <T> T Get(String name) {
+        manager.finishLoadingAsset(name);
+        return manager.get(name);
     }
 
 }

@@ -1,17 +1,27 @@
 package com.application.javagame;
 
+import com.application.javagame.Managers.Assets;
+import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Screens.PlayScreen;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.physics.bullet.Bullet;
 
 public class MyGame extends Game {
 
-	GameState state;
-	PlayScreen currentScreen;
 
 	@Override
 	public void create() {
-		state = new GameState(this);
-		currentScreen = new PlayScreen(state);
-		setScreen(currentScreen);
+		// Inicializa bullet
+		Bullet.init();
+		Assets.Initialize();
+		InputManager.Initialize();
+		// carrega a tela principal
+		setScreen(new PlayScreen(new GameState()));
+	}
+
+	@Override
+	public void render() {
+		super.render();
+		InputManager.getInputManager().update();
 	}
 }
