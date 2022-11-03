@@ -2,6 +2,8 @@ package com.application.javagame;
 
 import java.util.ArrayList;
 
+import com.application.javagame.Managers.PhysicsWorld;
+import com.application.javagame.Objects.Entities.Ball;
 import com.application.javagame.Objects.Entities.Bullet;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.GameObject;
@@ -21,15 +23,21 @@ import net.mgsx.gltf.scene3d.scene.SceneManager;
 public class GameState implements Disposable {
 
     private final SceneManager sceneManager;
+    private final PhysicsWorld physicsWorld;
+
     public final ArrayList<GameObject> gameObjects;
-    private final ArrayList<GameObject> gameObjectsPool;
+    private final ArrayList<GameObject> gameObjectsToRemove;
+    private final ArrayList<GameObject> gameObjectsToAdd;
 
     public float delta;
 
     public GameState() {
         delta = 0;
+        physicsWorld = new PhysicsWorld();
+
         gameObjects = new ArrayList<>();
-        gameObjectsPool = new ArrayList<>();
+        gameObjectsToAdd = new ArrayList<>();
+        gameObjectsToRemove = new ArrayList<>();
 
         preloadAssets();
 
@@ -42,20 +50,40 @@ public class GameState implements Disposable {
 
         addGameObject(player);
         addGameObject(new Bullet(new Vector3(0, 0, 10), Vector3.Zero, 0));
+
+        Ball ball = new Ball(new Vector3(0, 10, 0));
+        physicsWorld.addBody(ball.getBody());
+        addGameObject(ball);
+
+        Ball ball2 = new Ball(new Vector3(0, 0, 0));
+        physicsWorld.addCollision(ball2.getObj());
+        addGameObject(ball2);
     }
 
     public void addGameObject(GameObject object) {
-        gameObjectsPool.add(object);
+        gameObjectsToAdd.add(object);
         sceneManager.addScene(object);
+    }
+
+    public void removeGameObject(GameObject object) {
+        gameObjectsToRemove.add(object);
+        sceneManager.removeScene(object);
     }
 
     public void update(float delta) {
         this.delta = delta;
 
-        if(!gameObjectsPool.isEmpty()) {
-            gameObjects.addAll(gameObjectsPool);
-            gameObjectsPool.clear();
+        if(!gameObjectsToAdd.isEmpty()) {
+            gameObjects.addAll(gameObjectsToAdd);
+            gameObjectsToAdd.clear();
         }
+
+        if(!gameObjectsToRemove.isEmpty()) {
+            gameObjects.removeAll(gameObjectsToRemove);
+            gameObjectsToRemove.clear();
+        }
+
+        physicsWorld.update(delta);
 
         for (GameObject object : gameObjects) {
             object.update(this);

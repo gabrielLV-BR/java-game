@@ -10,6 +10,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.*;
+import com.badlogic.gdx.physics.bullet.dynamics.*;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Player extends GameObject {
@@ -21,6 +23,9 @@ public class Player extends GameObject {
     float yaw; // rotação horizontal da câmera
 
     Vector3 tmpVector;
+
+    btCollisionShape shape;
+    btRigidBody body;
 
     public Player() {
         super (Assets.<SceneAsset>Get("player.glb").scene, Vector3.Zero);
