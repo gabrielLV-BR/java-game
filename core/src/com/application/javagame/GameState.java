@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.application.javagame.Managers.PhysicsWorld;
 import com.application.javagame.Objects.Entities.Ball;
 import com.application.javagame.Objects.Entities.Bullet;
+import com.application.javagame.Objects.Entities.Floor;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Managers.Assets;
@@ -23,7 +24,7 @@ import net.mgsx.gltf.scene3d.scene.SceneManager;
 public class GameState implements Disposable {
 
     private final SceneManager sceneManager;
-    private final PhysicsWorld physicsWorld;
+    public final PhysicsWorld physicsWorld;
 
     public final ArrayList<GameObject> gameObjects;
     private final ArrayList<GameObject> gameObjectsToRemove;
@@ -58,6 +59,10 @@ public class GameState implements Disposable {
         Ball ball2 = new Ball(new Vector3(0, 0, 0));
         physicsWorld.addCollision(ball2.getObj());
         addGameObject(ball2);
+
+        Floor floor = new Floor(Vector3.Zero);
+        physicsWorld.addCollision(floor.getBody());
+        addGameObject(floor);
     }
 
     public void addGameObject(GameObject object) {

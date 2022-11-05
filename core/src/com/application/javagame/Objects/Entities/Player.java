@@ -22,6 +22,7 @@ public class Player extends GameObject {
     float mouseSensitivity; // sensitividade do mouse
     float yaw; // rotação horizontal da câmera
 
+    boolean fired = false;
     Vector3 tmpVector;
 
     btCollisionShape shape;
@@ -53,8 +54,11 @@ public class Player extends GameObject {
 
         move(state.delta);
 
-        if(InputManager.getInputManager().getMouseState().button == Input.Buttons.LEFT)
-            fire(state);
+        if(
+            InputManager.getInputManager().getMouseState().button == Input.Buttons.LEFT
+            && !fired
+        ) fire(state);
+        else fired = false;
 
         System.out.println("Camera position: (" + camera.position.x + ", " + camera.position.y + ")");
     }
@@ -94,8 +98,10 @@ public class Player extends GameObject {
     }
 
     void fire(GameState state) {
+        fired = true;
         System.out.println("Fogo!");
         Bullet bullet = new Bullet(camera.position.cpy(), camera.direction.cpy(), 20);
         state.addGameObject(bullet);
+        state.physicsWorld.addBody(bullet.getBody());
     }
 }
