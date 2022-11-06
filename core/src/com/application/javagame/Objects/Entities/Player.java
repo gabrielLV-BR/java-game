@@ -5,13 +5,15 @@ import com.application.javagame.Globals.Actions;
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
+import com.application.javagame.Objects.Entities.Enemies.Crawler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.collision.*;
-import com.badlogic.gdx.physics.bullet.dynamics.*;
+import com.badlogic.gdx.math.collision.Ray;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Player extends GameObject {
@@ -24,9 +26,6 @@ public class Player extends GameObject {
 
     boolean fired = false;
     Vector3 tmpVector;
-
-    btCollisionShape shape;
-    btRigidBody body;
 
     public Player() {
         super (Assets.<SceneAsset>Get("player.glb").scene, Vector3.Zero);
@@ -54,13 +53,9 @@ public class Player extends GameObject {
 
         move(state.delta);
 
-        if(
-            InputManager.getInputManager().getMouseState().button == Input.Buttons.LEFT
-            && !fired
-        ) fire(state);
-        else fired = false;
-
-        System.out.println("Camera position: (" + camera.position.x + ", " + camera.position.y + ")");
+        if(InputManager.getInputManager().getMouseState().button == Input.Buttons.LEFT) {
+            if (!fired) fire(state);
+        } else fired = false;
     }
 
     private void move(float delta) {
@@ -98,10 +93,21 @@ public class Player extends GameObject {
     }
 
     void fire(GameState state) {
+        btCollisionObject hit = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
+        
+        if(hit != null) {
+            if(hit.userData instanceof Crawler) {
+                Crawler enemy = (Crawler) hit.userData;
+                System.out.println("Acertou o inimigo!");
+
+                state.removeGameObject(enemy);
+                state.physicsWorld.removeBody(enemy.getBody());
+            }
+        }
+
         fired = true;
-        System.out.println("Fogo!");
-        Bullet bullet = new Bullet(camera.position.cpy(), camera.direction.cpy(), 20);
-        state.addGameObject(bullet);
-        state.physicsWorld.addBody(bullet.getBody());
+        Ball ball = new Ball(camera.position.cpy(), camera.direction.cpy().scl(30));
+        state.addGameObject(ball);
+        state.physicsWorld.addBody(ball.getBody());
     }
 }

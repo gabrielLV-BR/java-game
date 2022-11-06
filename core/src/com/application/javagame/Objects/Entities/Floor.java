@@ -31,14 +31,14 @@ public class Floor extends GameObject {
 
         ModelBuilder modelBuilder = new ModelBuilder();
         Model model = modelBuilder.createBox(
-                10, 2, 10,
+                100, 1, 100,
                 new Material(ColorAttribute.createDiffuse(1, 0, 0, 1)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
 
         modelInstance = new ModelInstance(model, p);
 
-        shape = new btBoxShape(new Vector3(10, 2, 10).scl(0.5f));
+        shape = new btBoxShape(new Vector3(100, 1, 100).scl(0.5f));
 
         float mass = 0f;
 //        Vector3 inertia = new Vector3();

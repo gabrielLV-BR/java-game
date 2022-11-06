@@ -8,8 +8,12 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneModel;
 
 public abstract class GameObject extends Scene implements Disposable {
+
+    protected Vector3 tmpVector;
+
     protected GameObject(SceneModel sceneModel, Vector3 p) {
         super(sceneModel);
+        tmpVector = new Vector3();
         modelInstance.transform.setTranslation(p);
     }
 

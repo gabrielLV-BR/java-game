@@ -3,27 +3,35 @@ package com.application.javagame;
 import java.util.ArrayList;
 
 import com.application.javagame.Managers.PhysicsWorld;
-import com.application.javagame.Objects.Entities.Ball;
-import com.application.javagame.Objects.Entities.Bullet;
-import com.application.javagame.Objects.Entities.Floor;
-import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Managers.Assets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleShader.Config;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
 import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
+import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
+import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
+import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
+import net.mgsx.gltf.scene3d.scene.SceneSkybox;
+import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
+import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 
 
 public class GameState implements Disposable {
 
-    private final SceneManager sceneManager;
+    public final SceneManager sceneManager;
     public final PhysicsWorld physicsWorld;
 
     public final ArrayList<GameObject> gameObjects;
@@ -42,27 +50,52 @@ public class GameState implements Disposable {
 
         preloadAssets();
 
-        sceneManager = new SceneManager();
+        PBRShaderConfig shaderConfig = PBRShaderProvider.createDefaultConfig();
+        shaderConfig.numBones = 60;
+        shaderConfig.numDirectionalLights = 1;
+        shaderConfig.numPointLights = 0;
+
+        com.badlogic.gdx.graphics.g3d.shaders.DepthShader.Config depthConfig = 
+            PBRShaderProvider.createDefaultDepthConfig();
+        
+        depthConfig.numBones = shaderConfig.numBones;
+
+        sceneManager = new SceneManager(
+            new PBRShaderProvider(shaderConfig),
+            new PBRDepthShaderProvider(depthConfig)
+        );
+
+        configSceneManager();
+        setupIBL();
+    }
+
+    private void configSceneManager() {
         sceneManager.setAmbientLight(0.3f);
         sceneManager.updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        Player player = new Player();
-        sceneManager.setCamera(player.getCamera());
+    }
 
-        addGameObject(player);
-        addGameObject(new Bullet(new Vector3(0, 0, 10), Vector3.Zero, 0));
+    private void setupIBL() {
+        DirectionalLightEx light = new DirectionalLightEx();
+        light.set(Color.WHITE, new Vector3(1, -1, 0).nor());
+        light.intensity = 10f;
+        sceneManager.environment.add(light);
 
-        Ball ball = new Ball(new Vector3(0, 10, 0));
-        physicsWorld.addBody(ball.getBody());
-        addGameObject(ball);
+        IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
+        Cubemap environmentMap = iblBuilder.buildEnvMap(1024);
+        Cubemap diffuseMap = iblBuilder.buildIrradianceMap(256);
+        Cubemap specularMap = iblBuilder.buildRadianceMap(10);
+        iblBuilder.dispose();
 
-        Ball ball2 = new Ball(new Vector3(0, 0, 0));
-        physicsWorld.addCollision(ball2.getObj());
-        addGameObject(ball2);
+        Texture brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
 
-        Floor floor = new Floor(Vector3.Zero);
-        physicsWorld.addCollision(floor.getBody());
-        addGameObject(floor);
+        sceneManager.setAmbientLight(1f);
+        sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT));
+        sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseMap));
+        sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularMap));
+
+        SceneSkybox skybox = new SceneSkybox(environmentMap);
+        sceneManager.setSkyBox(skybox);
     }
 
     public void addGameObject(GameObject object) {
@@ -101,6 +134,8 @@ public class GameState implements Disposable {
         sceneManager.camera.update();
         sceneManager.update(delta);
         sceneManager.render();
+
+        physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {
@@ -112,7 +147,8 @@ public class GameState implements Disposable {
 		manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         manager.load("player.glb", SceneAsset.class);
-        manager.load("bullet.gltf", SceneAsset.class);
+        manager.load("sphere.glb", SceneAsset.class);
+        manager.load("diabo.gltf", SceneAsset.class);
     }
 
     @Override public void dispose() {
