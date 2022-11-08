@@ -149,6 +149,7 @@ public class GameState implements Disposable {
         manager.load("player.glb", SceneAsset.class);
         manager.load("sphere.glb", SceneAsset.class);
         manager.load("diabo.gltf", SceneAsset.class);
+        manager.load("enemy.glb", SceneAsset.class);
     }
 
     @Override public void dispose() {
