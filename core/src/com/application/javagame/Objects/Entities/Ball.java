@@ -19,7 +19,7 @@ public class Ball extends GameObject {
     Vector3 velocity;
 
     public Ball(Vector3 p, Vector3 dir){
-        super(Assets.<SceneAsset>Get("sphere.glb").scene, p);
+        super(Assets.<SceneAsset>Get("bullet.glb").scene, p);
 
         float radius = 2f;
 

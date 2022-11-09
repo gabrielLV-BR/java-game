@@ -5,7 +5,7 @@ import com.application.javagame.Globals.Actions;
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
-import com.application.javagame.Objects.Entities.Enemies.Crawler;
+import com.application.javagame.Objects.Entities.Crawler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;

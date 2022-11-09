@@ -2,7 +2,7 @@ package com.application.javagame.Screens;
 
 import com.application.javagame.GameState;
 import com.application.javagame.Objects.Entities.Player;
-import com.application.javagame.Objects.Entities.Enemies.Crawler;
+import com.application.javagame.Objects.Entities.Crawler;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.math.Vector3;
 

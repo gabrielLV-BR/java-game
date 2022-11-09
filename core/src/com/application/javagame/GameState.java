@@ -147,9 +147,9 @@ public class GameState implements Disposable {
 		manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         manager.load("player.glb", SceneAsset.class);
-        manager.load("sphere.glb", SceneAsset.class);
-        manager.load("diabo.gltf", SceneAsset.class);
-        manager.load("enemy.glb", SceneAsset.class);
+        manager.load("demonio.glb", SceneAsset.class);
+        manager.load("demonio2.glb", SceneAsset.class);
+        manager.load("bullet.glb", SceneAsset.class);
     }
 
     @Override public void dispose() {
