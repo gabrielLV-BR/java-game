@@ -17,6 +17,7 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.*;
+import net.mgsx.gltf.scene3d.scene.SceneModel;
 
 public class Floor extends GameObject {
 
@@ -26,19 +27,19 @@ public class Floor extends GameObject {
 
     boolean usingShape = false;
 
-    public Floor(Vector3 p){
-        super(Assets.<SceneAsset>Get("bullet.gltf").scene, p);
+    public Floor(Vector3 p, Vector3 size){
+        super(Assets.<SceneAsset>Get("bullet.glb").scene, p);
 
         ModelBuilder modelBuilder = new ModelBuilder();
         Model model = modelBuilder.createBox(
-                100, 1, 100,
+                size.x, size.y, size.z,
                 new Material(ColorAttribute.createDiffuse(1, 0, 0, 1)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
 
         modelInstance = new ModelInstance(model, p);
 
-        shape = new btBoxShape(new Vector3(100, 1, 100).scl(0.5f));
+        shape = new btBoxShape(size.scl(0.5f));
 
         float mass = 0f;
 //        Vector3 inertia = new Vector3();

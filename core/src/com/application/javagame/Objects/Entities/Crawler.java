@@ -17,22 +17,39 @@ import net.mgsx.gltf.scene3d.scene.SceneModel;
 public class Crawler extends GameObject {
 
     btRigidBody body;
-    btCollisionShape shape;
 
     public Crawler(Vector3 p) {
         super(Assets.<SceneAsset>Get("demon.gltf").scene, p);
-        shape = loadCollision();
 
-        float mass = 0f;
+        int collisionShapeIndex = getCollisionNodeShape();
+        btCollisionShape shape;
+
+        collisionShapeIndex = -1;
+
+        if(collisionShapeIndex == -1) {
+            BoundingBox bb = new BoundingBox();
+            modelInstance.calculateBoundingBox(bb);
+            shape = new btBoxShape(bb.getDimensions(tmpVector).scl(0.5f));
+        } else {
+            shape = Bullet.obtainStaticNodeShape(
+                modelInstance.nodes.get(collisionShapeIndex),
+                false
+            );
+            shape.setLocalScaling(tmpVector.set(0.5f, 0.5f, 0.5f));
+            modelInstance.nodes.removeIndex(collisionShapeIndex);
+        }
+
+        float mass = 10f;
         Vector3 inertia = Vector3.Zero;
         shape.calculateLocalInertia(mass, inertia);
 
         body = new btRigidBody(mass, null, shape, inertia);
+        body.translate(p);
     }
 
     @Override
     public void update(GameState state) {
-        
+        body.getWorldTransform(modelInstance.transform);
     }
 
     public btRigidBody getBody() {

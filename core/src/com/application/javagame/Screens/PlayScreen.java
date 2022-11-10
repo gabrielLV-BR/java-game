@@ -2,6 +2,7 @@ package com.application.javagame.Screens;
 
 import com.application.javagame.GameState;
 import com.application.javagame.Objects.Entities.Player;
+import com.application.javagame.Objects.Entities.Floor;
 import com.application.javagame.Objects.Entities.Crawler;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.math.Vector3;
@@ -17,16 +18,17 @@ public class PlayScreen extends ScreenAdapter {
         Player player = new Player();
         state.sceneManager.setCamera(player.getCamera());
 
+        state.setPlayer(player);
         state.addGameObject(player);
 
         // Loading level
-        Crawler crawler = new Crawler(Vector3.Zero);
+        Crawler crawler = new Crawler(new Vector3(0, 20, 0));
         state.addGameObject(crawler);
         state.physicsWorld.addBody(crawler.getBody());
 
-        // Floor floor = new Floor(Vector3.Zero);
-        // state.addGameObject(floor);
-        // state.physicsWorld.addBody(floor.getBody());
+         Floor floor = new Floor(new Vector3(0, -10, 0), new Vector3(100, 2 ,100));
+         state.addGameObject(floor);
+         state.physicsWorld.addBody(floor.getBody());
 
         //{
         //  SceneAsset levelAsset = Assets.Get("bunkers.glb");

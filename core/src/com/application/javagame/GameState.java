@@ -3,6 +3,7 @@ package com.application.javagame;
 import java.util.ArrayList;
 
 import com.application.javagame.Managers.PhysicsWorld;
+import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Managers.Assets;
 import com.badlogic.gdx.Gdx;
@@ -35,9 +36,10 @@ public class GameState implements Disposable {
     public final PhysicsWorld physicsWorld;
 
     public final ArrayList<GameObject> gameObjects;
-    private final ArrayList<GameObject> gameObjectsToRemove;
     private final ArrayList<GameObject> gameObjectsToAdd;
+    private final ArrayList<GameObject> gameObjectsToRemove;
 
+    private Player player = null;
     public float delta;
 
     public GameState() {
@@ -67,6 +69,14 @@ public class GameState implements Disposable {
 
         configSceneManager();
         setupIBL();
+    }
+
+    public void setPlayer(Player p ) {
+        this.player = p;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     private void configSceneManager() {
@@ -147,8 +157,7 @@ public class GameState implements Disposable {
 		manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         manager.load("player.glb", SceneAsset.class);
-        manager.load("demonio.glb", SceneAsset.class);
-        manager.load("demonio2.glb", SceneAsset.class);
+        manager.load("demon.gltf", SceneAsset.class);
         manager.load("bullet.glb", SceneAsset.class);
     }
 

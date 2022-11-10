@@ -1,8 +1,6 @@
 package com.application.javagame.Objects;
 
 import com.application.javagame.GameState;
-import com.application.javagame.Managers.Assets;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Vector3;
 
@@ -12,7 +10,6 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.utils.Disposable;
 import net.mgsx.gltf.scene3d.scene.Scene;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneModel;
 
 public abstract class GameObject extends Scene implements Disposable {
@@ -25,15 +22,26 @@ public abstract class GameObject extends Scene implements Disposable {
         modelInstance.transform.setTranslation(p);
     }
 
+    protected int getCollisionNodeShape() {
+        int index = 0;
+        for (Node node : modelInstance.nodes) {
+            if (node.id.equals("collision")) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
     protected btCollisionShape loadCollision() {
-        btCollisionShape shape = new btBoxShape(Vector3.Zero);
+        btCollisionShape out = new btBoxShape(Vector3.Zero);
 
         int index = 0;
         boolean foundCollisionShape = false;
         for (Node node : modelInstance.nodes) {
             if (node.id.equals("collision")) {
-                shape = Bullet.obtainStaticNodeShape(node, true);
-                shape.setLocalScaling(tmpVector.set(0.5f, 0.5f, 0.5f));
+                out = Bullet.obtainStaticNodeShape(node, false);
+                out.setLocalScaling(tmpVector);
                 foundCollisionShape = true;
             } else index++;
         }
@@ -43,10 +51,10 @@ public abstract class GameObject extends Scene implements Disposable {
         else {
             BoundingBox bb = new BoundingBox();
             modelInstance.calculateBoundingBox(bb);
-            shape = new btBoxShape(bb.getDimensions(tmpVector));
+            out = new btBoxShape(bb.getDimensions(tmpVector));
         }
 
-        return shape;
+        return out;
     }
 
     public abstract void update(GameState state);
