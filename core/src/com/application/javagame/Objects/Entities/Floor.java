@@ -46,6 +46,7 @@ public class Floor extends GameObject {
 //        shape.calculateLocalInertia(mass, inertia);
 
         body = new btRigidBody(mass, null, shape, Vector3.Zero);
+        body.setFriction(10f);
         obj = new btCollisionObject();
         obj.setCollisionShape(shape);
     }

@@ -12,7 +12,6 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
-import net.mgsx.gltf.scene3d.scene.SceneModel;
 
 public class Crawler extends GameObject {
 
@@ -24,8 +23,6 @@ public class Crawler extends GameObject {
         int collisionShapeIndex = getCollisionNodeShape();
         btCollisionShape shape;
 
-        collisionShapeIndex = -1;
-
         if(collisionShapeIndex == -1) {
             BoundingBox bb = new BoundingBox();
             modelInstance.calculateBoundingBox(bb);
@@ -35,7 +32,7 @@ public class Crawler extends GameObject {
                 modelInstance.nodes.get(collisionShapeIndex),
                 false
             );
-            shape.setLocalScaling(tmpVector.set(0.5f, 0.5f, 0.5f));
+            shape.setLocalScaling(tmpVector.set(1f, 1f, 1f));
             modelInstance.nodes.removeIndex(collisionShapeIndex);
         }
 
@@ -45,11 +42,14 @@ public class Crawler extends GameObject {
 
         body = new btRigidBody(mass, null, shape, inertia);
         body.translate(p);
+
+        animations.playAll(true);
     }
 
     @Override
     public void update(GameState state) {
         body.getWorldTransform(modelInstance.transform);
+        animations.update(state.delta);
     }
 
     public btRigidBody getBody() {

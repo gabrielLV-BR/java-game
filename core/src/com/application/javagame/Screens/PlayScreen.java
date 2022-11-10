@@ -15,11 +15,12 @@ public class PlayScreen extends ScreenAdapter {
 
         this.state = s;
 
-        Player player = new Player();
+        Player player = new Player(new Vector3(0, 10, 0));
         state.sceneManager.setCamera(player.getCamera());
 
         state.setPlayer(player);
         state.addGameObject(player);
+        state.physicsWorld.addBody(player.getBody());
 
         // Loading level
         Crawler crawler = new Crawler(new Vector3(0, 20, 0));

@@ -25,7 +25,7 @@ public abstract class GameObject extends Scene implements Disposable {
     protected int getCollisionNodeShape() {
         int index = 0;
         for (Node node : modelInstance.nodes) {
-            if (node.id.equals("collision")) {
+            if (node.id.equals("COLLISION.001")) {
                 return index;
             }
             index++;
@@ -39,7 +39,7 @@ public abstract class GameObject extends Scene implements Disposable {
         int index = 0;
         boolean foundCollisionShape = false;
         for (Node node : modelInstance.nodes) {
-            if (node.id.equals("collision")) {
+            if (node.id.equals("COLLISION")) {
                 out = Bullet.obtainStaticNodeShape(node, false);
                 out.setLocalScaling(tmpVector);
                 foundCollisionShape = true;

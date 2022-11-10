@@ -11,14 +11,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.badlogic.gdx.physics.bullet.collision.*;
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Player extends GameObject {
 
     PerspectiveCamera camera;
+    btRigidBody body;
 
     float speed; // velocidade
     float mouseSensitivity; // sensitividade do mouse
@@ -27,8 +30,8 @@ public class Player extends GameObject {
     boolean fired = false;
     Vector3 tmpVector;
 
-    public Player() {
-        super (Assets.<SceneAsset>Get("player.glb").scene, Vector3.Zero);
+    public Player(Vector3 position) {
+        super (Assets.<SceneAsset>Get("player.glb").scene, position);
 
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         camera.position.set(0f, 0f, 3f);
@@ -41,6 +44,23 @@ public class Player extends GameObject {
         yaw = 0f;
 
         tmpVector = new Vector3();
+
+        BoundingBox bb = new BoundingBox();
+        modelInstance.calculateBoundingBox(bb);
+        btCollisionShape shape = new btBoxShape(
+                bb.getDimensions(tmpVector).scl(0.5f)
+        );
+
+        float mass = 10f;
+        tmpVector.set(0, 0, 0);
+        shape.calculateLocalInertia(mass, tmpVector);
+
+        body = new btRigidBody(mass, null, shape, tmpVector);
+        body.translate(position);
+    }
+
+    public btRigidBody getBody() {
+        return body;
     }
 
     public PerspectiveCamera getCamera() {
@@ -56,6 +76,9 @@ public class Player extends GameObject {
         if(InputManager.getInputManager().getMouseState().button == Input.Buttons.LEFT) {
             if (!fired) fire(state);
         } else fired = false;
+
+//        body.getWorldTransform(modelInstance.transform);
+        camera.position.set(body.getCenterOfMassPosition());
     }
 
     private void move(float delta) {
@@ -67,9 +90,11 @@ public class Player extends GameObject {
             inMan.keyStrength(Actions.Player.BACKWARD) - inMan.keyStrength(Actions.Player.FORWARD)
         );
 
-        camera.position
+        Vector3 movement = Vector3.Zero
             .add(camera.direction.cpy().scl(-input.z * delta * speed))
             .add(camera.direction.cpy().crs(Vector3.Y).scl(input.x * delta * speed));
+
+        body.setLinearVelocity(movement);
     }
 
 
