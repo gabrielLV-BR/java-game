@@ -1,6 +1,7 @@
 package com.application.javagame.Screens;
 
 import com.application.javagame.GameState;
+import com.application.javagame.Objects.Entities.Floor;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.Entities.Floor;
 import com.application.javagame.Objects.Entities.Crawler;
@@ -25,7 +26,7 @@ public class PlayScreen extends ScreenAdapter {
         // Loading level
         Crawler crawler = new Crawler(new Vector3(0, 20, 0));
         state.addGameObject(crawler);
-        state.physicsWorld.addBody(crawler.getBody());
+        // state.physicsWorld.addBody(crawler.getBody());
 
          Floor floor = new Floor(new Vector3(0, -10, 0), new Vector3(100, 2 ,100));
          state.addGameObject(floor);

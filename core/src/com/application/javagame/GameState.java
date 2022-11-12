@@ -6,6 +6,7 @@ import com.application.javagame.Managers.PhysicsWorld;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Managers.Assets;
+import com.application.javagame.Managers.CollisionWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -34,6 +35,7 @@ public class GameState implements Disposable {
 
     public final SceneManager sceneManager;
     public final PhysicsWorld physicsWorld;
+    public final CollisionWorld collisionWorld;
 
     public final ArrayList<GameObject> gameObjects;
     private final ArrayList<GameObject> gameObjectsToAdd;
@@ -45,6 +47,7 @@ public class GameState implements Disposable {
     public GameState() {
         delta = 0;
         physicsWorld = new PhysicsWorld();
+        collisionWorld = new CollisionWorld();
 
         gameObjects = new ArrayList<>();
         gameObjectsToAdd = new ArrayList<>();
@@ -157,8 +160,8 @@ public class GameState implements Disposable {
 		manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         manager.load("player.glb", SceneAsset.class);
-        manager.load("demon.gltf", SceneAsset.class);
-        manager.load("bullet.glb", SceneAsset.class);
+        manager.load("sphere.glb", SceneAsset.class);
+        manager.load("diabo.gltf", SceneAsset.class);
     }
 
     @Override public void dispose() {

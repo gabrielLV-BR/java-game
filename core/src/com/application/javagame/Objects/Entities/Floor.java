@@ -51,11 +51,6 @@ public class Floor extends GameObject {
         obj.setCollisionShape(shape);
     }
 
-    public btCollisionObject getObj() {
-        usingShape = true;
-        return obj;
-    }
-
     public btRigidBody getBody() {
         usingShape = true;
         return body;

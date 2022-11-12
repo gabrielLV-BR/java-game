@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.utils.Disposable;
 import net.mgsx.gltf.scene3d.scene.Scene;
@@ -15,11 +16,17 @@ import net.mgsx.gltf.scene3d.scene.SceneModel;
 public abstract class GameObject extends Scene implements Disposable {
 
     protected Vector3 tmpVector;
+    protected btCollisionObject collisionObject;
 
     protected GameObject(SceneModel sceneModel, Vector3 p) {
         super(sceneModel);
         tmpVector = new Vector3();
         modelInstance.transform.setTranslation(p);
+        collisionObject = new btCollisionObject();
+    }
+
+    public btCollisionObject getCollisionObject() {
+        return collisionObject;
     }
 
     protected int getCollisionNodeShape() {
