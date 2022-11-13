@@ -16,7 +16,9 @@ public class MyGame extends Game {
 		Assets.Initialize();
 		InputManager.Initialize();
 		// carrega a tela principal
-		setScreen(new PlayScreen(new GameState()));
+		GameState state = new GameState();
+		PlayScreen tela = new PlayScreen(state);
+		setScreen(tela);
 	}
 
 	@Override

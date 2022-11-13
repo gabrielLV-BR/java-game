@@ -13,16 +13,27 @@ import com.badlogic.gdx.utils.Disposable;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneModel;
 
-public abstract class GameObject extends Scene implements Disposable {
+public abstract class GameObject implements Disposable {
 
+    protected Scene scene;
     protected Vector3 tmpVector;
     protected btCollisionObject collisionObject;
 
     protected GameObject(SceneModel sceneModel, Vector3 p) {
-        super(sceneModel);
         tmpVector = new Vector3();
-        modelInstance.transform.setTranslation(p);
+        scene = new Scene(sceneModel);
+        scene.modelInstance.transform.setTranslation(p);
         collisionObject = new btCollisionObject();
+    }
+
+    protected GameObject() {
+        tmpVector = new Vector3();
+        scene = null;
+        collisionObject = new btCollisionObject();
+    }
+
+    public Scene getScene() {
+        return scene;
     }
 
     public btCollisionObject getCollisionObject() {
@@ -31,33 +42,24 @@ public abstract class GameObject extends Scene implements Disposable {
 
     protected int getCollisionNodeShape() {
         int index = 0;
-        for (Node node : modelInstance.nodes) {
-            if (node.id.equals("COLLISION.001")) {
+        for (Node node : scene.modelInstance.nodes) {
+            if (node.id.equals("COLLISION")) {
                 return index;
             }
             index++;
         }
         return -1;
     }
-
     protected btCollisionShape loadCollision() {
         btCollisionShape out = new btBoxShape(Vector3.Zero);
 
-        int index = 0;
-        boolean foundCollisionShape = false;
-        for (Node node : modelInstance.nodes) {
-            if (node.id.equals("COLLISION")) {
-                out = Bullet.obtainStaticNodeShape(node, false);
-                out.setLocalScaling(tmpVector);
-                foundCollisionShape = true;
-            } else index++;
-        }
+        int index = getCollisionNodeShape();
 
-        if(foundCollisionShape)
-            modelInstance.nodes.removeIndex(index);
+        if(index != -1)
+            scene.modelInstance.nodes.removeIndex(index);
         else {
             BoundingBox bb = new BoundingBox();
-            modelInstance.calculateBoundingBox(bb);
+            scene.modelInstance.calculateBoundingBox(bb);
             out = new btBoxShape(bb.getDimensions(tmpVector));
         }
 

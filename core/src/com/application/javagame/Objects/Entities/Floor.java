@@ -1,7 +1,6 @@
 package com.application.javagame.Objects.Entities;
 
 import com.application.javagame.GameState;
-import com.application.javagame.Managers.Assets;
 import com.application.javagame.Objects.GameObject;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -9,15 +8,12 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.*;
-import net.mgsx.gltf.scene3d.scene.SceneModel;
+
+import net.mgsx.gltf.scene3d.scene.Scene;
 
 public class Floor extends GameObject {
 
@@ -28,16 +24,17 @@ public class Floor extends GameObject {
     boolean usingShape = false;
 
     public Floor(Vector3 p, Vector3 size){
-        super(Assets.<SceneAsset>Get("bullet.glb").scene, p);
+        super();
 
         ModelBuilder modelBuilder = new ModelBuilder();
         Model model = modelBuilder.createBox(
-                size.x, size.y, size.z,
-                new Material(ColorAttribute.createDiffuse(1, 0, 0, 1)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+            size.x, size.y, size.z,
+            new Material(ColorAttribute.createDiffuse(1, 0, 0, 1)),
+            VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
 
-        modelInstance = new ModelInstance(model, p);
+        scene = new Scene(model);
+        scene.modelInstance = new ModelInstance(model, p);
 
         shape = new btBoxShape(size.scl(0.5f));
 
@@ -63,9 +60,9 @@ public class Floor extends GameObject {
     @Override
     public void update(GameState state) {
         if (usingShape) {
-            obj.getWorldTransform(modelInstance.transform);
+            obj.getWorldTransform(scene.modelInstance.transform);
         } else {
-            body.getWorldTransform(modelInstance.transform);
+            body.getWorldTransform(scene.modelInstance.transform);
         }
     }
 }

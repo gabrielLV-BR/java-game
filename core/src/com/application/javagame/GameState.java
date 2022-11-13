@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g3d.particles.ParticleShader.Config;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -29,7 +28,6 @@ import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
-
 
 public class GameState implements Disposable {
 
@@ -53,8 +51,6 @@ public class GameState implements Disposable {
         gameObjectsToAdd = new ArrayList<>();
         gameObjectsToRemove = new ArrayList<>();
 
-        preloadAssets();
-
         PBRShaderConfig shaderConfig = PBRShaderProvider.createDefaultConfig();
         shaderConfig.numBones = 60;
         shaderConfig.numDirectionalLights = 1;
@@ -70,6 +66,7 @@ public class GameState implements Disposable {
             new PBRDepthShaderProvider(depthConfig)
         );
 
+        preloadAssets();
         configSceneManager();
         setupIBL();
     }
@@ -113,12 +110,14 @@ public class GameState implements Disposable {
 
     public void addGameObject(GameObject object) {
         gameObjectsToAdd.add(object);
-        sceneManager.addScene(object);
+        if(object.getScene() != null) 
+            sceneManager.addScene(object.getScene());
     }
 
     public void removeGameObject(GameObject object) {
         gameObjectsToRemove.add(object);
-        sceneManager.removeScene(object);
+        if(object.getScene() != null) 
+            sceneManager.removeScene(object.getScene());
     }
 
     public void update(float delta) {
@@ -160,8 +159,7 @@ public class GameState implements Disposable {
 		manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         manager.load("player.glb", SceneAsset.class);
-        manager.load("sphere.glb", SceneAsset.class);
-        manager.load("diabo.gltf", SceneAsset.class);
+        manager.load("crawler.glb", SceneAsset.class);
     }
 
     @Override public void dispose() {

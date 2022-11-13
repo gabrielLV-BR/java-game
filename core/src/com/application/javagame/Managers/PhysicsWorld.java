@@ -1,5 +1,7 @@
 package com.application.javagame.Managers;
 
+import javax.management.DynamicMBean;
+
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.math.collision.Ray;
@@ -60,11 +62,17 @@ public class PhysicsWorld {
     public void addBody(btRigidBody body) {
         dynamicsWorld.addRigidBody(body);
     }
+    
     public void removeBody(btRigidBody body) {
         dynamicsWorld.removeRigidBody(body);
     }
-    public void addCollisionObject(btCollisionObject obj) {
-        dynamicsWorld.addCollisionObject(obj, 1 << 9, -1);
+    
+    public void addController(btActionInterface action) {
+        dynamicsWorld.addAction(action);
+    }
+
+    public void removeController(btActionInterface action) {
+        dynamicsWorld.removeAction(action);
     }
 
     /*
