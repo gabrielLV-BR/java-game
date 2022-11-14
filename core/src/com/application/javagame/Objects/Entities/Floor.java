@@ -12,13 +12,14 @@ import com.badlogic.gdx.math.Vector3;
 
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.*;
+import com.badlogic.gdx.physics.bullet.extras.CoilCreator;
+import com.badlogic.gdx.physics.bullet.softbody.btSoftBody.Pose;
 
 import net.mgsx.gltf.scene3d.scene.Scene;
 
 public class Floor extends GameObject {
 
     btCollisionShape shape;
-    btCollisionObject obj;
     btRigidBody body;
 
     boolean usingShape = false;
@@ -39,30 +40,17 @@ public class Floor extends GameObject {
         shape = new btBoxShape(size.scl(0.5f));
 
         float mass = 0f;
-//        Vector3 inertia = new Vector3();
-//        shape.calculateLocalInertia(mass, inertia);
-
         body = new btRigidBody(mass, null, shape, Vector3.Zero);
         body.setFriction(10f);
-        obj = new btCollisionObject();
-        obj.setCollisionShape(shape);
+        body.translate(p);
     }
 
     public btRigidBody getBody() {
-        usingShape = true;
         return body;
-    }
-
-    public btCollisionShape getShape() {
-        return shape;
     }
 
     @Override
     public void update(GameState state) {
-        if (usingShape) {
-            obj.getWorldTransform(scene.modelInstance.transform);
-        } else {
-            body.getWorldTransform(scene.modelInstance.transform);
-        }
+        body.getWorldTransform(scene.modelInstance.transform);
     }
 }

@@ -82,7 +82,6 @@ public class GameState implements Disposable {
     private void configSceneManager() {
         sceneManager.setAmbientLight(0.3f);
         sceneManager.updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
     }
 
     private void setupIBL() {
@@ -160,6 +159,8 @@ public class GameState implements Disposable {
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         manager.load("player.glb", SceneAsset.class);
         manager.load("crawler.glb", SceneAsset.class);
+        manager.load("cube.glb", SceneAsset.class);
+        manager.load("sphere.glb", SceneAsset.class);
     }
 
     @Override public void dispose() {

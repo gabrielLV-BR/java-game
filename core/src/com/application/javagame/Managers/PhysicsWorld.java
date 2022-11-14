@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
 
 public class PhysicsWorld {
 
-    private final btDynamicsWorld dynamicsWorld;
+    public final btDynamicsWorld dynamicsWorld;
 
     private final btCollisionConfiguration collisionConfiguration;
     private final btDispatcher dispatcher;

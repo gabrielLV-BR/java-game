@@ -21,8 +21,7 @@ public class Ball extends GameObject {
     public Ball(Vector3 p, Vector3 dir){
         super(Assets.<SceneAsset>Get("player.glb").scene, p);
 
-        float radius = 2f;
-
+        float radius = 20f;
         shape = new btSphereShape(radius / 2f);
 
         float mass = 1f;

@@ -18,29 +18,31 @@ public class CollisionWorld implements Disposable {
   btManifoldResult result;
 
   public CollisionWorld() {
+    collisionConfig = new btDefaultCollisionConfiguration();
+    dispatcher = new btCollisionDispatcher(collisionConfig);
     dispatcherInfo = new btDispatcherInfo();
     result = new btManifoldResult();
   }
 
-  public boolean CheckCollision(GameObject a, GameObject b) {
-    co1 = new CollisionObjectWrapper(a.getCollisionObject());
-    co2 = new CollisionObjectWrapper(b.getCollisionObject());
+  // public boolean CheckCollision(GameObject a, GameObject b) {
+  //   co1 = new CollisionObjectWrapper(a.getCollisionObject());
+  //   co2 = new CollisionObjectWrapper(b.getCollisionObject());
 
-    algorithm = dispatcher.findAlgorithm(
-      co1.wrapper, co2.wrapper, 
-      null, 
-      ebtDispatcherQueryType.BT_CONTACT_POINT_ALGORITHMS
-    );
+  //   algorithm = dispatcher.findAlgorithm(
+  //     co1.wrapper, co2.wrapper, 
+  //     null, 
+  //     ebtDispatcherQueryType.BT_CONTACT_POINT_ALGORITHMS
+  //   );
 
-    result.setBody0Wrap(co1.wrapper);
-    result.setBody1Wrap(co2.wrapper);
+  //   result.setBody0Wrap(co1.wrapper);
+  //   result.setBody1Wrap(co2.wrapper);
 
-    dispatcher.freeCollisionAlgorithm(algorithm.getCPointer());
+  //   dispatcher.freeCollisionAlgorithm(algorithm.getCPointer());
 
-    btPersistentManifold persistentManifold = result.getPersistentManifold();
+  //   btPersistentManifold persistentManifold = result.getPersistentManifold();
 
-    return persistentManifold != null && persistentManifold.getNumContacts() > 0;
-  }
+  //   return persistentManifold != null && persistentManifold.getNumContacts() > 0;
+  // }
 
   @Override
   public void dispose() {
