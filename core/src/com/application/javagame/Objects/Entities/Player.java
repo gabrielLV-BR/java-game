@@ -84,11 +84,11 @@ public class Player extends GameObject {
             .scl(100);
         movement.y = 0;
 
-        if(!movement.equals(Vector3.Zero.setZero())) {
-            body.setLinearVelocity(movement);
+        if(!movement.equals(tmpVector.setZero())) {
+            body.setLinearVelocity(movement.set(movement.x, body.getLinearVelocity().y, movement.z));
         } else {
-            body.setAngularVelocity(Vector3.Zero);
-            body.setLinearVelocity(new Vector3(0, body.getLinearVelocity().y, 0));
+            body.setAngularVelocity(tmpVector);
+            body.setLinearVelocity(tmpVector.set(0, body.getLinearVelocity().y, 0));
         }
     }
 
@@ -112,21 +112,24 @@ public class Player extends GameObject {
     }
 
     void fire(GameState state) {
-        btCollisionObject hit = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
+        RayResultCallback resultCallback = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
         
-        if(hit != null) {
-            if(hit.userData instanceof Crawler) {
-                Crawler enemy = (Crawler) hit.userData;
+        System.out.println("Acertou: " + resultCallback.getCollisionObject());
+
+        if(resultCallback.hasHit()) {
+            if(resultCallback.getCollisionObject().userData instanceof Crawler) {
+                Crawler enemy = (Crawler)resultCallback.getCollisionObject().userData;
                 System.out.println("Acertou o inimigo!");
+                enemy.wave();
 
                 state.removeGameObject(enemy);
                 state.physicsWorld.removeBody(enemy.getBody());
             }
         }
 
-        fired = true;
-        Ball ball = new Ball(camera.position.cpy(), camera.direction.cpy().scl(30));
-        state.addGameObject(ball);
-        state.physicsWorld.addBody(ball.getBody());
+        // fired = true;
+        // Ball ball = new Ball(camera.position.cpy(), camera.direction.cpy().scl(30));
+        // state.addGameObject(ball);
+        // state.physicsWorld.addBody(ball.getBody());
     }
 }

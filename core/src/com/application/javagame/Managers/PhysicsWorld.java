@@ -27,7 +27,7 @@ public class PhysicsWorld {
 
     private static final Vector3 rayFrom = new Vector3();
     private static final Vector3 rayTo = new Vector3();
-    private static final ClosestRayResultCallback callback = new ClosestRayResultCallback(rayFrom, rayTo);
+    private static ClosestRayResultCallback callback;
 
 
     public PhysicsWorld() {
@@ -78,21 +78,16 @@ public class PhysicsWorld {
     /*
         Código pego daqui -> https://stackoverflow.com/questions/24988852/raycasting-in-libgdx-3d/24989069#24989069
     */
-    public btCollisionObject rayCast(Ray ray) {
+    public RayResultCallback rayCast(Ray ray) {
         rayFrom.set(ray.origin);
-        rayTo.set(ray.direction).scl(50f).add(rayFrom);
-    
+        rayTo.set(ray.direction).scl(5000f).add(rayFrom);
+
+        callback = new ClosestRayResultCallback(rayFrom, rayTo);
         callback.setCollisionObject(null);
         callback.setClosestHitFraction(1f);
-        callback.getRayFromWorld(rayFrom);
-        callback.getRayToWorld(rayTo);
     
         dynamicsWorld.rayTest(rayFrom, rayTo, callback);
     
-        if (callback.hasHit()) {
-            return callback.getCollisionObject();
-        }
-    
-        return null;
+        return callback;
     }
 }

@@ -1,6 +1,5 @@
 package com.application.javagame.Managers;
 
-import com.application.javagame.Objects.GameObject;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -10,7 +9,6 @@ public class CollisionWorld implements Disposable {
   btDispatcher dispatcher;
 
   //
-
   private CollisionObjectWrapper co1;
   private CollisionObjectWrapper co2;
   private btCollisionAlgorithm algorithm;

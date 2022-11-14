@@ -16,7 +16,7 @@ public class Crawler extends GameObject {
     btRigidBody body;
 
     public Crawler(Vector3 p) {
-        super(Assets.<SceneAsset>Get("player.glb").scene, p);
+        super(Assets.<SceneAsset>Get("crawler.glb").scene, p);
 
         int collisionShapeIndex = getCollisionNodeShape();
         btCollisionShape shape;
@@ -40,6 +40,7 @@ public class Crawler extends GameObject {
 
         body = new btRigidBody(mass, null, shape, inertia);
         body.translate(p);
+        body.userData = this;
 
         scene.animations.playAll(true);
     }
@@ -52,5 +53,9 @@ public class Crawler extends GameObject {
 
     public btRigidBody getBody() {
         return body;
+    }
+
+    public void wave() {
+        System.out.println("Acenando a alguém");
     }
 }
