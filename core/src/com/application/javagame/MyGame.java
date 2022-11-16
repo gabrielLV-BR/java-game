@@ -24,6 +24,6 @@ public class MyGame extends Game {
 	@Override
 	public void render() {
 		super.render();
-		InputManager.getInputManager().update();
+		InputManager.GetInputManager().update();
 	}
 }

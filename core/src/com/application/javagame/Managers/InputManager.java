@@ -42,7 +42,7 @@ public class InputManager implements Disposable, InputProcessor {
         Gdx.input.setInputProcessor(inputManager);
     }
 
-    public static InputManager getInputManager() {
+    public static InputManager GetInputManager() {
         return inputManager;
     }
 

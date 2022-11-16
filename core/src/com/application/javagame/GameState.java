@@ -6,13 +6,18 @@ import com.application.javagame.Managers.PhysicsWorld;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Managers.Assets;
-import com.application.javagame.Managers.CollisionWorld;
+import com.application.javagame.Managers.InputManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
+import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.badlogic.gdx.graphics.g3d.decals.SimpleOrthoGroupStrategy;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -33,7 +38,9 @@ public class GameState implements Disposable {
 
     public final SceneManager sceneManager;
     public final PhysicsWorld physicsWorld;
-    public final CollisionWorld collisionWorld;
+    //public final CollisionWorld collisionWorld;
+    public final DecalBatch decalBatch;
+    private final SpriteBatch spriteBatch;
 
     public final ArrayList<GameObject> gameObjects;
     private final ArrayList<GameObject> gameObjectsToAdd;
@@ -42,10 +49,14 @@ public class GameState implements Disposable {
     private Player player = null;
     public float delta;
 
+    private Sprite crosshair;
+
     public GameState() {
         delta = 0;
         physicsWorld = new PhysicsWorld();
-        collisionWorld = new CollisionWorld();
+        //collisionWorld = new CollisionWorld();
+        decalBatch = new DecalBatch(new SimpleOrthoGroupStrategy());
+        spriteBatch = new SpriteBatch();
 
         gameObjects = new ArrayList<>();
         gameObjectsToAdd = new ArrayList<>();
@@ -69,10 +80,14 @@ public class GameState implements Disposable {
         preloadAssets();
         configSceneManager();
         setupIBL();
+
+        crosshair = new Sprite(Assets.<Texture>Get("crosshair.png"));
+        updateCrosshairPosition();
     }
 
     public void setPlayer(Player p ) {
         this.player = p;
+        decalBatch.setGroupStrategy(new CameraGroupStrategy(p.getCamera()));
     }
 
     public Player getPlayer() {
@@ -145,11 +160,17 @@ public class GameState implements Disposable {
         sceneManager.camera.update();
         sceneManager.update(delta);
         sceneManager.render();
+        decalBatch.flush();
+
+        spriteBatch.begin();
+        crosshair.draw(spriteBatch);    
+        spriteBatch.end();
 
         physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {
+        updateCrosshairPosition();
         sceneManager.updateViewport(width, height);
     }
 
@@ -161,11 +182,28 @@ public class GameState implements Disposable {
         manager.load("crawler.glb", SceneAsset.class);
         manager.load("cube.glb", SceneAsset.class);
         manager.load("sphere.glb", SceneAsset.class);
+
+        manager.load("crosshair.png", Texture.class);
+        manager.load("explosion.png", Texture.class);
+    }
+
+    private void updateCrosshairPosition() {
+        crosshair.setPosition(
+            Gdx.graphics.getWidth() / 2 - crosshair.getWidth() / 2,
+            Gdx.graphics.getHeight() / 2 - crosshair.getHeight() / 2 
+        );
     }
 
     @Override public void dispose() {
         for(GameObject object : gameObjects) {
             object.dispose();
         }
+
+        Assets.GetManager().dispose();
+        InputManager.GetInputManager().dispose();
+
+        decalBatch.dispose();
+        sceneManager.dispose();
+        physicsWorld.dispose();
     }
 }

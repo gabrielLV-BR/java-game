@@ -15,7 +15,7 @@ public class PlayScreen extends ScreenAdapter {
 
         this.state = s;
 
-        Player player = new Player(new Vector3(0, 200, 0));
+        Player player = new Player(new Vector3(0, 10, 0));
         state.sceneManager.setCamera(player.getCamera());
 
         state.setPlayer(player);
@@ -24,11 +24,11 @@ public class PlayScreen extends ScreenAdapter {
         state.physicsWorld.addBody(player.getBody());
 
         // Loading level
-        Crawler crawler = new Crawler(new Vector3(0, 100, 0));
+        Crawler crawler = new Crawler(new Vector3(0, 10, 0));
         state.addGameObject(crawler);
         state.physicsWorld.addBody(crawler.getBody());
 
-        Floor floor = new Floor(new Vector3(0, 20, 0), new Vector3(100, 2 ,100));
+        Floor floor = new Floor(new Vector3(0, 0, 0), new Vector3(100, 2 ,100));
         state.addGameObject(floor);
         state.physicsWorld.addBody(floor.getBody());
         // state.physicsWorld.dynamicsWorld.addCollisionObject(floor.getCollisionObject());

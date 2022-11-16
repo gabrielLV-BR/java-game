@@ -2,17 +2,22 @@ package com.application.javagame.Objects.Entities;
 
 import com.application.javagame.GameState;
 import com.application.javagame.Globals.Actions;
+import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
+import com.application.javagame.Objects.Particle;
 import com.application.javagame.Objects.Entities.Enemies.Crawler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+
+import javafx.geometry.Dimension2D;
 
 public class Player extends GameObject {
 
@@ -39,7 +44,7 @@ public class Player extends GameObject {
 
         float mass = 10f;
         float radius = 5f;
-        btCollisionShape shape = new btBoxShape(new Vector3(radius, radius, radius));
+        btCollisionShape shape = new btSphereShape(radius);
         tmpVector.set(0, 0, 0);
         shape.calculateLocalInertia(mass, tmpVector);
 
@@ -62,7 +67,7 @@ public class Player extends GameObject {
 
         move(state.delta);
 
-        if(InputManager.getInputManager().getMouseState().button == Input.Buttons.LEFT) {
+        if(InputManager.GetInputManager().getMouseState().button == Input.Buttons.LEFT) {
             if (!fired) fire(state);
         } else fired = false;
 
@@ -70,7 +75,7 @@ public class Player extends GameObject {
     }
 
     private void move(float delta) {
-        InputManager inMan = InputManager.getInputManager();
+        InputManager inMan = InputManager.GetInputManager();
 
         Vector3 input = tmpVector.set(
             inMan.keyStrength(Actions.Player.RIGHT) - inMan.keyStrength(Actions.Player.LEFT),
@@ -85,6 +90,7 @@ public class Player extends GameObject {
         movement.y = 0;
 
         if(!movement.equals(tmpVector.setZero())) {
+            body.activate(true);
             body.setLinearVelocity(movement.set(movement.x, body.getLinearVelocity().y, movement.z));
         } else {
             body.setAngularVelocity(tmpVector);
@@ -97,7 +103,7 @@ public class Player extends GameObject {
         Foi alterado para que se encaixasse com a estruturação atual
     */
     void rotateCamera() {
-        Vector2 mouseDelta = InputManager.getInputManager().getMouseState().delta;
+        Vector2 mouseDelta = InputManager.GetInputManager().getMouseState().delta;
 
         float x = mouseDelta.x ;
         if(x != 0) {
@@ -112,7 +118,7 @@ public class Player extends GameObject {
     }
 
     void fire(GameState state) {
-        RayResultCallback resultCallback = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
+        ClosestRayResultCallback resultCallback = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
         
         System.out.println("Acertou: " + resultCallback.getCollisionObject());
 
@@ -125,6 +131,12 @@ public class Player extends GameObject {
                 state.removeGameObject(enemy);
                 state.physicsWorld.removeBody(enemy.getBody());
             }
+            resultCallback.getHitPointWorld(tmpVector);
+
+            Texture txt = Assets.Get("explosion.png");
+
+            Particle p = new Particle(txt, tmpVector, 2, new Dimension2D(50.0, 50.0));
+            state.addGameObject(p);
         }
 
         // fired = true;

@@ -10,8 +10,9 @@ import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.*;
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
+import com.badlogic.gdx.utils.Disposable;
 
-public class PhysicsWorld {
+public class PhysicsWorld implements Disposable {
 
     public final btDynamicsWorld dynamicsWorld;
 
@@ -78,7 +79,7 @@ public class PhysicsWorld {
     /*
         Código pego daqui -> https://stackoverflow.com/questions/24988852/raycasting-in-libgdx-3d/24989069#24989069
     */
-    public RayResultCallback rayCast(Ray ray) {
+    public ClosestRayResultCallback rayCast(Ray ray) {
         rayFrom.set(ray.origin);
         rayTo.set(ray.direction).scl(5000f).add(rayFrom);
 
@@ -89,5 +90,15 @@ public class PhysicsWorld {
         dynamicsWorld.rayTest(rayFrom, rayTo, callback);
     
         return callback;
+    }
+
+    public void dispose() {
+        broadphaseInterface.dispose();
+        callback.dispose();
+        collisionConfiguration.dispose();
+        constraintSolver.dispose();
+        dispatcher.dispose();
+        debugDrawer.dispose();
+        dynamicsWorld.dispose();
     }
 }
