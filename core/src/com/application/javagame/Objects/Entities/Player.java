@@ -9,6 +9,7 @@ import com.application.javagame.Objects.Particle;
 import com.application.javagame.Objects.Entities.Enemies.Crawler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -29,6 +30,11 @@ public class Player extends GameObject {
     float yaw; // rotação horizontal da câmera
 
     boolean fired = false;
+    Sound fireSound;
+
+    //TODO: Criar classe arma e botar isso lá
+    float fireTime;
+    final float maxFireTime;
 
     public Player(Vector3 position) {
         super();
@@ -51,6 +57,10 @@ public class Player extends GameObject {
         body = new btRigidBody(mass, null, shape, tmpVector);
         body.setFriction(1.0f);
         body.translate(position);
+
+        fireSound = Assets.Get("sounds/shotgun.mp3");
+        fireTime = 0f;
+        maxFireTime = 0.8f;
     }
 
     public btRigidBody getBody() {
@@ -68,8 +78,13 @@ public class Player extends GameObject {
         move(state.delta);
 
         if(InputManager.GetInputManager().getMouseState().button == Input.Buttons.LEFT) {
-            if (!fired) fire(state);
-        } else fired = false;
+            if(fireTime > maxFireTime) {
+                fire(state);
+                fireTime = 0f;
+            }
+        }
+
+        fireTime += state.delta;
 
         camera.position.set(body.getCenterOfMassPosition());
     }
@@ -120,10 +135,11 @@ public class Player extends GameObject {
     void fire(GameState state) {
         ClosestRayResultCallback resultCallback = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
         
-        System.out.println("Acertou: " + resultCallback.getCollisionObject());
+        fireSound.play();
 
         if(resultCallback.hasHit()) {
             if(resultCallback.getCollisionObject().userData instanceof Crawler) {
+                System.out.println("Acertou: " + resultCallback.getCollisionObject());
                 Crawler enemy = (Crawler)resultCallback.getCollisionObject().userData;
                 System.out.println("Acertou o inimigo!");
                 enemy.wave();
@@ -134,8 +150,7 @@ public class Player extends GameObject {
             resultCallback.getHitPointWorld(tmpVector);
 
             Texture txt = Assets.Get("explosion.png");
-
-            Particle p = new Particle(txt, tmpVector, 2, new Dimension2D(50.0, 50.0));
+            Particle p = new Particle(txt, tmpVector, 1, new Dimension2D(50.0, 50.0));
             state.addGameObject(p);
         }
 

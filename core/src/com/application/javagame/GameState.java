@@ -9,6 +9,7 @@ import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.GL20;
@@ -183,6 +184,7 @@ public class GameState implements Disposable {
         manager.load("cube.glb", SceneAsset.class);
         manager.load("sphere.glb", SceneAsset.class);
 
+        manager.load("sounds/shotgun.mp3", Sound.class);
         manager.load("crosshair.png", Texture.class);
         manager.load("explosion.png", Texture.class);
     }

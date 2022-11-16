@@ -15,12 +15,14 @@ import javafx.geometry.Dimension2D;
 public class Particle extends GameObject {
 
     float duration;
+    final float initialDuration;
     Decal decal;
 
     public Particle(Texture texture, Vector3 position, float duration, Dimension2D dimension) {
         decal = Decal.newDecal(new TextureRegion(texture), true);
         decal.setPosition(position);
         this.duration = duration;
+        this.initialDuration = duration;
         decal.setDimensions((float)dimension.getWidth(),(float)dimension.getHeight());
     }
 
@@ -34,6 +36,11 @@ public class Particle extends GameObject {
         decal.lookAt(camera.position, camera.up);
 
         duration -= state.delta;
+
+        float normalizedDuration = duration / initialDuration;
+
+        decal.setScale(normalizedDuration);
+
         if(duration <= 0) state.removeGameObject(this);
         else state.decalBatch.add(decal);   
     }
