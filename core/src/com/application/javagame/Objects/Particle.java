@@ -4,10 +4,7 @@ import com.application.javagame.GameState;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.decals.DecalMaterial;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import javafx.geometry.Dimension2D;
@@ -39,10 +36,14 @@ public class Particle extends GameObject {
 
         float normalizedDuration = duration / initialDuration;
 
-        decal.setScale(normalizedDuration);
+        decal.setScale(easingFunction(normalizedDuration));
 
         if(duration <= 0) state.removeGameObject(this);
         else state.decalBatch.add(decal);   
+    }
+
+    private float easingFunction(float num) {
+        return num;
     }
 
     public Decal getDecal() { return decal; }

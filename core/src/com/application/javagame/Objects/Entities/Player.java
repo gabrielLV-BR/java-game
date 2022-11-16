@@ -135,7 +135,7 @@ public class Player extends GameObject {
     void fire(GameState state) {
         ClosestRayResultCallback resultCallback = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
         
-        fireSound.play();
+        fireSound.play(0.2f);
 
         if(resultCallback.hasHit()) {
             if(resultCallback.getCollisionObject().userData instanceof Crawler) {
@@ -150,7 +150,7 @@ public class Player extends GameObject {
             resultCallback.getHitPointWorld(tmpVector);
 
             Texture txt = Assets.Get("explosion.png");
-            Particle p = new Particle(txt, tmpVector, 1, new Dimension2D(50.0, 50.0));
+            Particle p = new Particle(txt, tmpVector, 0.1f, new Dimension2D(50.0, 50.0));
             state.addGameObject(p);
         }
 
