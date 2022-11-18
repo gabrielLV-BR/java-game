@@ -2,6 +2,7 @@ package com.application.javagame.Utils;
 
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
 import com.badlogic.gdx.physics.bullet.collision.btShapeHull;
 
@@ -19,5 +20,9 @@ public class Utils3D {
 		shape.dispose();
 		hull.dispose();
 		return result;
+	}
+
+	public static void printVector3(String label, Vector3 v) {
+		System.out.println(label + ": (" + v.x + ", " + v.y + ", " + v.z + ")");
 	}
 }

@@ -48,7 +48,7 @@ public class Player extends GameObject {
         mouseSensitivity = 0.7f;
         yaw = 0f;
 
-        float mass = 10f;
+        float mass = 90f;
         float radius = 5f;
         btCollisionShape shape = new btSphereShape(radius);
         tmpVector.set(0, 0, 0);
@@ -158,5 +158,9 @@ public class Player extends GameObject {
         // Ball ball = new Ball(camera.position.cpy(), camera.direction.cpy().scl(30));
         // state.addGameObject(ball);
         // state.physicsWorld.addBody(ball.getBody());
+    }
+    // Getters
+    public Vector3 getPosition() {
+        return tmpVector.set(body.getCenterOfMassPosition());
     }
 }

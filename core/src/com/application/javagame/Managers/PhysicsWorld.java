@@ -43,6 +43,7 @@ public class PhysicsWorld implements Disposable {
             constraintSolver,
             collisionConfiguration
         );
+        dynamicsWorld.setGravity(new Vector3(0, -100, 0));
 
         //
         debugDrawer = new DebugDrawer();

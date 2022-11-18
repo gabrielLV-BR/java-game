@@ -3,6 +3,7 @@ package com.application.javagame.Objects.Entities.Enemies;
 import com.application.javagame.GameState;
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Objects.GameObject;
+import com.application.javagame.Utils.Utils3D;
 import com.badlogic.gdx.math.Vector3;
 
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -13,10 +14,13 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Crawler extends GameObject {
 
+    private final float speed;
     btRigidBody body;
 
     public Crawler(Vector3 p) {
         super(Assets.<SceneAsset>Get("crawler.glb").scene, p);
+
+        speed = 2000;
 
         int collisionShapeIndex = getCollisionNodeShape();
         btCollisionShape shape;
@@ -47,6 +51,20 @@ public class Crawler extends GameObject {
 
     @Override
     public void update(GameState state) {
+
+        Vector3 playerPos = state.getPlayer().getPosition();
+        Vector3 myPos = (body.getCenterOfMassPosition()).cpy();
+
+        Vector3 toPlayer = tmpVector.set(playerPos).sub(myPos).nor().scl(1);
+
+        Utils3D.printVector3("Player Position", playerPos);
+        Utils3D.printVector3("My Position", myPos);
+        Utils3D.printVector3("toPlayer", toPlayer);
+        System.out.println("---------------");
+
+        scene.modelInstance.transform.setToLookAt(toPlayer, state.getPlayer().getCamera().up);
+        body.setLinearVelocity(new Vector3(toPlayer.x, body.getLinearVelocity().y, toPlayer.z));
+
         body.getWorldTransform(scene.modelInstance.transform);
         scene.animations.update(state.delta);
     }
