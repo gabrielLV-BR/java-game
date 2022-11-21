@@ -39,7 +39,6 @@ public class GameState implements Disposable {
 
     public final SceneManager sceneManager;
     public final PhysicsWorld physicsWorld;
-    //public final CollisionWorld collisionWorld;
     public final DecalBatch decalBatch;
     private final SpriteBatch spriteBatch;
 
@@ -55,7 +54,6 @@ public class GameState implements Disposable {
     public GameState() {
         delta = 0;
         physicsWorld = new PhysicsWorld();
-        //collisionWorld = new CollisionWorld();
         decalBatch = new DecalBatch(new SimpleOrthoGroupStrategy());
         spriteBatch = new SpriteBatch();
 

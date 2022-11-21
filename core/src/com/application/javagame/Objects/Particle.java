@@ -5,9 +5,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-
-import javafx.geometry.Dimension2D;
 
 public class Particle extends GameObject {
 
@@ -15,16 +14,16 @@ public class Particle extends GameObject {
     final float initialDuration;
     Decal decal;
 
-    public Particle(Texture texture, Vector3 position, float duration, Dimension2D dimension) {
+    public Particle(Texture texture, Vector3 position, float duration, Vector2 dimension) {
         decal = Decal.newDecal(new TextureRegion(texture), true);
         decal.setPosition(position);
         this.duration = duration;
         this.initialDuration = duration;
-        decal.setDimensions((float)dimension.getWidth(),(float)dimension.getHeight());
+        decal.setDimensions(dimension.x, dimension.y);
     }
 
     public Particle(Texture texture, Vector3 position, float duration) {
-        this(texture, position, duration, new Dimension2D(texture.getWidth(), texture.getHeight()));
+        this(texture, position, duration, new Vector2(texture.getWidth(), texture.getHeight()));
     }
 
     @Override
@@ -48,8 +47,5 @@ public class Particle extends GameObject {
 
     public Decal getDecal() { return decal; }
     public float getRemainingTime() { return duration; }
-    public void setDuration(float dur) { duration = dur; }
-
-
-    
+    public void setDuration(float dur) { duration = dur; }    
 }

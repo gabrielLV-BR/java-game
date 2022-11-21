@@ -12,13 +12,17 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
-public class Crawler extends GameObject {
+public class Crawler extends Enemy {
+
+    private static final String NAME = "Crawler";
+    private static final float DAMAGE = 2;
+    private static final float LIFE = 10;
 
     private final float speed;
     btRigidBody body;
 
     public Crawler(Vector3 p) {
-        super(Assets.<SceneAsset>Get("crawler.glb").scene, p);
+        super(Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE, NAME);
 
         speed = 2000;
 

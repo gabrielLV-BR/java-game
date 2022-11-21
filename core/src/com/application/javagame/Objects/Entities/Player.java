@@ -7,6 +7,8 @@ import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Objects.Particle;
 import com.application.javagame.Objects.Entities.Enemies.Crawler;
+import com.application.javagame.Objects.Weapons.Handgun;
+import com.application.javagame.Objects.Weapons.Weapon;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
@@ -18,23 +20,17 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
-import javafx.geometry.Dimension2D;
-
 public class Player extends GameObject {
 
     PerspectiveCamera camera;
     btRigidBody body;
 
+    Weapon weapon;
+
     float speed; // velocidade
     float mouseSensitivity; // sensitividade do mouse
     float yaw; // rotação horizontal da câmera
 
-    boolean fired = false;
-    Sound fireSound;
-
-    //TODO: Criar classe arma e botar isso lá
-    float fireTime;
-    final float maxFireTime;
 
     public Player(Vector3 position) {
         super();
@@ -58,9 +54,7 @@ public class Player extends GameObject {
         body.setFriction(1.0f);
         body.translate(position);
 
-        fireSound = Assets.Get("sounds/shotgun.mp3");
-        fireTime = 0f;
-        maxFireTime = 0.8f;
+        weapon = new Handgun(2, 0.7f, 10);
     }
 
     public btRigidBody getBody() {
@@ -78,14 +72,10 @@ public class Player extends GameObject {
         move(state.delta);
 
         if(InputManager.GetInputManager().getMouseState().button == Input.Buttons.LEFT) {
-            if(fireTime > maxFireTime) {
-                fire(state);
-                fireTime = 0f;
-            }
+            fire(state);
         }
 
-        fireTime += state.delta;
-
+        weapon.update(state);
         camera.position.set(body.getCenterOfMassPosition());
     }
 
@@ -133,31 +123,8 @@ public class Player extends GameObject {
     }
 
     void fire(GameState state) {
-        ClosestRayResultCallback resultCallback = state.physicsWorld.rayCast(new Ray(camera.position, camera.direction));
-        
-        fireSound.play(0.2f);
+        Ray ray = new Ray(camera.position, camera.direction);
 
-        if(resultCallback.hasHit()) {
-            if(resultCallback.getCollisionObject().userData instanceof Crawler) {
-                System.out.println("Acertou: " + resultCallback.getCollisionObject());
-                Crawler enemy = (Crawler)resultCallback.getCollisionObject().userData;
-                System.out.println("Acertou o inimigo!");
-                enemy.wave();
-
-                state.removeGameObject(enemy);
-                state.physicsWorld.removeBody(enemy.getBody());
-            }
-            resultCallback.getHitPointWorld(tmpVector);
-
-            Texture txt = Assets.Get("explosion.png");
-            Particle p = new Particle(txt, tmpVector, 0.1f, new Dimension2D(50.0, 50.0));
-            state.addGameObject(p);
-        }
-
-        // fired = true;
-        // Ball ball = new Ball(camera.position.cpy(), camera.direction.cpy().scl(30));
-        // state.addGameObject(ball);
-        // state.physicsWorld.addBody(ball.getBody());
     }
     // Getters
     public Vector3 getPosition() {
