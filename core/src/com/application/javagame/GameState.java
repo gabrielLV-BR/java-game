@@ -181,6 +181,7 @@ public class GameState implements Disposable {
         manager.load("crawler.glb", SceneAsset.class);
         manager.load("cube.glb", SceneAsset.class);
         manager.load("sphere.glb", SceneAsset.class);
+        manager.load("map.glb", SceneAsset.class);
 
         manager.load("sounds/shotgun.mp3", Sound.class);
         manager.load("crosshair.png", Texture.class);

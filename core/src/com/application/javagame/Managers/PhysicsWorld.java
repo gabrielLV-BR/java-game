@@ -1,11 +1,8 @@
 package com.application.javagame.Managers;
 
-import javax.management.DynamicMBean;
-
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.math.collision.Ray;
-import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.*;
@@ -30,7 +27,6 @@ public class PhysicsWorld implements Disposable {
     private static final Vector3 rayTo = new Vector3();
     private static ClosestRayResultCallback callback;
 
-
     public PhysicsWorld() {
         collisionConfiguration = new btDefaultCollisionConfiguration();
         dispatcher = new btCollisionDispatcher(collisionConfiguration);
@@ -38,12 +34,11 @@ public class PhysicsWorld implements Disposable {
         broadphaseInterface = new btDbvtBroadphase();
         constraintSolver = new btSequentialImpulseConstraintSolver();
         dynamicsWorld = new btDiscreteDynamicsWorld(
-            dispatcher,
-            broadphaseInterface,
-            constraintSolver,
-            collisionConfiguration
-        );
-        dynamicsWorld.setGravity(new Vector3(0, -100, 0));
+                dispatcher,
+                broadphaseInterface,
+                constraintSolver,
+                collisionConfiguration);
+        dynamicsWorld.setGravity(new Vector3(0, -200, 0));
 
         //
         debugDrawer = new DebugDrawer();
@@ -64,11 +59,11 @@ public class PhysicsWorld implements Disposable {
     public void addBody(btRigidBody body) {
         dynamicsWorld.addRigidBody(body);
     }
-    
+
     public void removeBody(btRigidBody body) {
         dynamicsWorld.removeRigidBody(body);
     }
-    
+
     public void addController(btActionInterface action) {
         dynamicsWorld.addAction(action);
     }
@@ -78,8 +73,10 @@ public class PhysicsWorld implements Disposable {
     }
 
     /*
-        Código pego daqui -> https://stackoverflow.com/questions/24988852/raycasting-in-libgdx-3d/24989069#24989069
-    */
+     * Código pego daqui ->
+     * https://stackoverflow.com/questions/24988852/raycasting-in-libgdx-3d/24989069
+     * #24989069
+     */
     public ClosestRayResultCallback rayCast(Ray ray) {
         rayFrom.set(ray.origin);
         rayTo.set(ray.direction).scl(5000f).add(rayFrom);
@@ -87,9 +84,9 @@ public class PhysicsWorld implements Disposable {
         callback = new ClosestRayResultCallback(rayFrom, rayTo);
         callback.setCollisionObject(null);
         callback.setClosestHitFraction(1f);
-    
+
         dynamicsWorld.rayTest(rayFrom, rayTo, callback);
-    
+
         return callback;
     }
 

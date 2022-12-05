@@ -29,15 +29,14 @@ public class Crawler extends Enemy {
         int collisionShapeIndex = getCollisionNodeShape();
         btCollisionShape shape;
 
-        if(collisionShapeIndex == -1) {
+        if (collisionShapeIndex == -1) {
             BoundingBox bb = new BoundingBox();
             scene.modelInstance.calculateBoundingBox(bb);
             shape = new btBoxShape(bb.getDimensions(tmpVector).scl(0.5f));
         } else {
             shape = Bullet.obtainStaticNodeShape(
-                scene.modelInstance.nodes.get(collisionShapeIndex),
-                false
-            );
+                    scene.modelInstance.nodes.get(collisionShapeIndex),
+                    false);
             shape.setLocalScaling(tmpVector.set(1f, 1f, 1f));
             scene.modelInstance.nodes.removeIndex(collisionShapeIndex);
         }
@@ -61,11 +60,12 @@ public class Crawler extends Enemy {
 
         Vector3 toPlayer = tmpVector.set(playerPos).sub(myPos).nor().scl(1);
 
-        Utils3D.printVector3("Player Position", playerPos);
-        Utils3D.printVector3("My Position", myPos);
-        Utils3D.printVector3("toPlayer", toPlayer);
-        System.out.println("---------------");
-
+        /*
+         * Utils3D.printVector3("Player Position", playerPos);
+         * Utils3D.printVector3("My Position", myPos);
+         * Utils3D.printVector3("toPlayer", toPlayer);
+         * System.out.println("---------------");
+         */
         scene.modelInstance.transform.setToLookAt(toPlayer, state.getPlayer().getCamera().up);
         body.setLinearVelocity(new Vector3(toPlayer.x, body.getLinearVelocity().y, toPlayer.z));
 
