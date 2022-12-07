@@ -1,7 +1,7 @@
 package com.application.javagame.Screens;
 
 import com.application.javagame.GameState;
-import com.application.javagame.Objects.Entities.Floor;
+import com.application.javagame.Objects.Map;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.Entities.Enemies.Crawler;
 import com.badlogic.gdx.ScreenAdapter;
@@ -15,7 +15,7 @@ public class PlayScreen extends ScreenAdapter {
 
         this.state = s;
 
-        Player player = new Player(new Vector3(0, 10, 0));
+        Player player = new Player(new Vector3(0, 200, 0));
         state.sceneManager.setCamera(player.getCamera());
 
         state.setPlayer(player);
@@ -24,13 +24,16 @@ public class PlayScreen extends ScreenAdapter {
         state.physicsWorld.addBody(player.getBody());
 
         // Loading level
-        Crawler crawler = new Crawler(new Vector3(0, 10, 0));
+        Crawler crawler = new Crawler(new Vector3(10, 2, 0));
         state.addGameObject(crawler);
         state.physicsWorld.addBody(crawler.getBody());
 
-        Floor floor = new Floor(new Vector3(0, 0, 0), new Vector3(100, 2 ,100));
-        state.addGameObject(floor);
-        state.physicsWorld.addBody(floor.getBody());
+        {
+            float mapScale = 10f;
+            new Map(state, new Vector3(0, 0, 0), new Vector3(mapScale, mapScale, mapScale));
+            // state.addGameObject(map);
+            // state.physicsWorld.addBody(map.getBody());
+        }
         // state.physicsWorld.dynamicsWorld.addCollisionObject(floor.getCollisionObject());
         //{
         //  SceneAsset levelAsset = Assets.Get("bunkers.glb");

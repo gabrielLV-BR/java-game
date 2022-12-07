@@ -1,5 +1,7 @@
 package com.application.javagame.Objects;
 
+import java.util.ArrayList;
+
 import com.application.javagame.GameState;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Vector3;
@@ -7,6 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneModel;
@@ -39,20 +42,24 @@ public abstract class GameObject implements Disposable {
     //     return collisionObject;
     // }
 
-    protected int getCollisionNodeShape() {
+    protected ArrayList<Integer> getCollisionNodesIndexes() {
         int index = 0;
+        ArrayList<Integer> indexes = new ArrayList<>(5);
+
         for (Node node : scene.modelInstance.nodes) {
-            if (node.id.equals("COLLISION")) {
-                return index;
+            if (node.id.startsWith("COLLISION")) {
+                indexes.add(index);
             }
             index++;
         }
-        return -1;
+        indexes.trimToSize();
+        return indexes;
     }
     protected btCollisionShape loadCollision() {
         btCollisionShape out = new btBoxShape(Vector3.Zero);
 
-        int index = getCollisionNodeShape();
+        ArrayList<Integer> indexes = getCollisionNodesIndexes();
+        int index = indexes.get(0);
 
         if(index != -1)
             scene.modelInstance.nodes.removeIndex(index);

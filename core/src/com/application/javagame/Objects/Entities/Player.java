@@ -11,7 +11,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
@@ -32,15 +31,17 @@ public class Player extends GameObject {
         camera.position.set(0f, 0f, 3f);
         camera.lookAt(0f, 0f, 0f);
         camera.near = 0.1f;
-        camera.far = 300f;
+        camera.far = 1000f;
 
-        speed = 50f;
+        speed = 80f;
         mouseSensitivity = 0.7f;
         yaw = 0f;
 
         float mass = 90f;
-        float radius = 5f;
+        float radius = 0.4f;
+
         btCollisionShape shape = new btSphereShape(radius);
+        shape = new btBoxShape(tmpVector.set(radius, radius, radius).scl(0.5f));
         tmpVector.set(0, 0, 0);
         shape.calculateLocalInertia(mass, tmpVector);
 

@@ -2,8 +2,6 @@ package com.application.javagame.Objects.Entities.Enemies;
 
 import com.application.javagame.GameState;
 import com.application.javagame.Managers.Assets;
-import com.application.javagame.Objects.GameObject;
-import com.application.javagame.Utils.Utils3D;
 import com.badlogic.gdx.math.Vector3;
 
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -26,7 +24,7 @@ public class Crawler extends Enemy {
 
         speed = 2000;
 
-        int collisionShapeIndex = getCollisionNodeShape();
+        int collisionShapeIndex = getCollisionNodesIndexes().get(0);
         btCollisionShape shape;
 
         if (collisionShapeIndex == -1) {
