@@ -8,6 +8,7 @@ import com.application.javagame.Objects.Weapons.Handgun;
 import com.application.javagame.Objects.Weapons.Weapon;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -18,6 +19,8 @@ public class Player extends GameObject {
 
     PerspectiveCamera camera;
     btRigidBody body;
+
+    Vector3 acceleration;
 
     Weapon weapon;
 
@@ -31,25 +34,37 @@ public class Player extends GameObject {
         camera.position.set(0f, 0f, 3f);
         camera.lookAt(0f, 0f, 0f);
         camera.near = 0.1f;
-        camera.far = 1000f;
+        camera.far = 100000f;
+
+        acceleration = new Vector3(0, 0, 0);
 
         speed = 80f;
         mouseSensitivity = 0.7f;
         yaw = 0f;
 
         float mass = 90f;
-        float radius = 0.4f;
+        float radius = 4f;
 
-        btCollisionShape shape = new btSphereShape(radius);
-        shape = new btBoxShape(tmpVector.set(radius, radius, radius).scl(0.5f));
+        btCollisionShape shape = new btCylinderShape(new Vector3(radius, radius * 2, radius));
+
         tmpVector.set(0, 0, 0);
         shape.calculateLocalInertia(mass, tmpVector);
 
         body = new btRigidBody(mass, null, shape, tmpVector);
-        body.setFriction(1.0f);
+        body.setAngularFactor(0);
         body.translate(position);
 
         weapon = new Handgun(2, 0.7f, 10);
+    }
+
+    @Override
+    public void register(GameState state) {
+        // registration
+        state.sceneManager.setCamera(getCamera());
+
+        state.setPlayer(this);
+        state.addGameObject(this);
+        state.physicsWorld.addBody(getBody());
     }
 
     public btRigidBody getBody() {
@@ -68,6 +83,10 @@ public class Player extends GameObject {
 
         if (InputManager.GetInputManager().getMouseState().button == Input.Buttons.LEFT) {
             fire(state);
+        }
+
+        if(InputManager.GetInputManager().keyStrength(Keys.SPACE) > 0) {
+            body.applyCentralImpulse(tmpVector.set(Vector3.Y).scl(100));;
         }
 
         weapon.update(state);
@@ -90,7 +109,8 @@ public class Player extends GameObject {
 
         if (!movement.equals(tmpVector.setZero())) {
             body.activate(true);
-            body.setLinearVelocity(movement.set(movement.x, body.getLinearVelocity().y, movement.z));
+            // body.setLinearVelocity(movement.set(movement.x, body.getLinearVelocity().y, movement.z));
+            body.applyCentralImpulse(movement);
         } else {
             body.setLinearVelocity(tmpVector.set(0, body.getLinearVelocity().y, 0));
         }

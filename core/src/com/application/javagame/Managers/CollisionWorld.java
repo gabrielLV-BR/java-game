@@ -11,7 +11,7 @@ public class CollisionWorld implements Disposable {
   //
   private CollisionObjectWrapper co1;
   private CollisionObjectWrapper co2;
-  private btCollisionAlgorithm algorithm;
+  //private btCollisionAlgorithm algorithm;
   btDispatcherInfo dispatcherInfo;
   btManifoldResult result;
 

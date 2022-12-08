@@ -15,38 +15,17 @@ public class PlayScreen extends ScreenAdapter {
 
         this.state = s;
 
-        Player player = new Player(new Vector3(0, 200, 0));
-        state.sceneManager.setCamera(player.getCamera());
-
-        state.setPlayer(player);
-        state.addGameObject(player);
-        // state.physicsWorld.addController(player.getController());
-        state.physicsWorld.addBody(player.getBody());
+        new Player(new Vector3(0, 10, 0))
+            .register(state);;
 
         // Loading level
-        Crawler crawler = new Crawler(new Vector3(10, 2, 0));
-        state.addGameObject(crawler);
-        state.physicsWorld.addBody(crawler.getBody());
+        new Crawler(new Vector3(10, 2, 0))
+            .register(state);;
 
-        {
-            float mapScale = 10f;
-            new Map(state, new Vector3(0, 0, 0), new Vector3(mapScale, mapScale, mapScale));
-            // state.addGameObject(map);
-            // state.physicsWorld.addBody(map.getBody());
-        }
-        // state.physicsWorld.dynamicsWorld.addCollisionObject(floor.getCollisionObject());
-        //{
-        //  SceneAsset levelAsset = Assets.Get("bunkers.glb");
-        //  for(SceneModel sceneModel : levelAsset.scenes) {
-        //      Scene levelScene = new Scene(sceneModel);
-        //      state.sceneManager.addScene(levelScene);
-        //      btCollisionShape shape = Bullet.obtainStaticNodeShape(levelScene.modelInstance.nodes);
-        //      btRigidBody levelBody = new btRigidBody(0, null, shape, Vector3.Zero);
-        //      state.physicsWorld.addBody(levelBody);
-        //  }
-        //}
+        new Map("map.glb", new Vector3(0, 0, 0), 1)
+            .register(state);;
+    
     }
-
     @Override
     public void render(float delta) {
         state.update(delta);

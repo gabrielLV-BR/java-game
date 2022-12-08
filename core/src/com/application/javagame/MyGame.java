@@ -12,7 +12,7 @@ public class MyGame extends Game {
 	@Override
 	public void create() {
 		// Inicializa bullet
-		Bullet.init();
+		Bullet.init(false, true);;
 		Assets.Initialize();
 		InputManager.Initialize();
 		// carrega a tela principal

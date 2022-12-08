@@ -44,10 +44,18 @@ public class Crawler extends Enemy {
         shape.calculateLocalInertia(mass, inertia);
 
         body = new btRigidBody(mass, null, shape, inertia);
+        body.setAngularFactor(0);
         body.translate(p);
         body.userData = this;
 
         scene.animations.playAll(true);
+    }
+
+    @Override
+    public void register(GameState state) {
+        // register
+        state.addGameObject(this);
+        state.physicsWorld.addBody(this.getBody());
     }
 
     @Override

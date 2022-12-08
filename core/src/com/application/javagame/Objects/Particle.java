@@ -27,6 +27,12 @@ public class Particle extends GameObject {
     }
 
     @Override
+    public void register(GameState state) {
+        System.out.println("Particle::register() NÃO IMPLEMENTADO");
+        return;
+    }
+
+    @Override
     public void update(GameState state) {
         Camera camera = state.getPlayer().getCamera();
         decal.lookAt(camera.position, camera.up);

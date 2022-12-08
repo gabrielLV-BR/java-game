@@ -36,6 +36,11 @@ public class Ball extends GameObject {
         velocity = dir;
     }
 
+    @Override
+    public void register(GameState state) {
+        System.out.println("Ball::register() NÃO IMPLEMENTADO");
+    }
+
     public btRigidBody getBody() {
         return body;
     }
