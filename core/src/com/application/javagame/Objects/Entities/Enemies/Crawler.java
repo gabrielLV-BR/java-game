@@ -20,7 +20,7 @@ public class Crawler extends Enemy {
     btRigidBody body;
 
     public Crawler(Vector3 p) {
-        super(Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE, NAME);
+        super(NAME, Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE);
 
         speed = 2000;
 

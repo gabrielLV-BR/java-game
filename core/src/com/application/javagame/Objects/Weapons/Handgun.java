@@ -44,7 +44,7 @@ public class Handgun extends Weapon {
                 System.out.println("Acertou o inimigo!");
 
                 state.removeGameObject(enemy);
-                enemy.hurt(DAMAGE);
+                enemy.damage(DAMAGE);
             }
             resultCallback.getHitPointWorld(tmpVector);
 

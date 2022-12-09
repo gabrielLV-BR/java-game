@@ -4,6 +4,7 @@ import com.application.javagame.GameState;
 import com.application.javagame.Objects.Map;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.Entities.Enemies.Crawler;
+import com.application.javagame.Objects.Entities.Enemies.Olho;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.math.Vector3;
 
@@ -21,6 +22,9 @@ public class PlayScreen extends ScreenAdapter {
         // Loading level
         new Crawler(new Vector3(10, 2, 0))
             .register(state);;
+        
+        new Olho(new Vector3(20, 10, 0))
+            .register(state);
 
         new Map("map.glb", new Vector3(0, 0, 0), 1)
             .register(state);;
