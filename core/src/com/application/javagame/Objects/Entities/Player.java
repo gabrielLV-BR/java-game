@@ -65,6 +65,8 @@ public class Player extends GameObject {
         state.setPlayer(this);
         state.addGameObject(this);
         state.physicsWorld.addBody(getBody());
+
+        weapon.register(state);
     }
 
     public btRigidBody getBody() {
@@ -142,7 +144,7 @@ public class Player extends GameObject {
     }
 
     // Getters
-    public Vector3 getPosition() {
+    public final Vector3 getPosition() {
         return tmpVector.set(body.getCenterOfMassPosition());
     }
 }

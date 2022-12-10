@@ -11,21 +11,36 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
+
 public class Handgun extends Weapon {
     public int bullets;
     boolean fired = false;
     Sound fireSound;
     float fireTime;
 
-    Vector3 tmpVector;
+    private final static float scale = 0.2f;
 
     public Handgun(float damage, float fireTime, int bulletsInMag) {
-        super("Handgun", damage, fireTime, bulletsInMag);
+        super(
+            "Handgun", 
+            Assets.<SceneAsset>Get("handgun.glb").scene,
+            damage, fireTime, bulletsInMag, new Vector3(5, 5, -5).scl(scale)
+        );
+
+        
+        scene.modelInstance.transform.scl(scale);
         bullets = bulletsInMag;
-        tmpVector = new Vector3();
 
         fireSound = Assets.Get("sounds/shotgun.mp3");
         fireTime = 0f;
+    }
+
+    @Override
+    public void update(GameState state) {
+        scene.modelInstance.transform.setTranslation(
+            state.getPlayer().getPosition().add(WEAPON_LOCATION_OFFSET)
+        );
     }
 
     @Override
