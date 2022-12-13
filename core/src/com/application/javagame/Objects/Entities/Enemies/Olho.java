@@ -22,10 +22,12 @@ public class Olho extends Enemy {
     private final btRigidBody body;
     private final float speed;
 
+    private Vector3 dir;
+
     public Olho(Vector3 p) {
         super(NAME, Assets.<SceneAsset>Get("vesper.glb").scene, p, LIFE, DAMAGE);
 
-        speed = 2;
+        speed = 20;
 
         ArrayList<Integer> collisionShapeIndexes = getCollisionNodesIndexes();
         btCollisionShape shape;
@@ -52,17 +54,35 @@ public class Olho extends Enemy {
         body.userData = this;
 
         scene.animations.playAll(true);
+
+        dir = new Vector3();
+    }
+
+    @Override
+    public void damage(float damage) {
+        life -= damage;
+
+        body.setLinearVelocity(tmpVector.set(dir).scl(-5));
     }
 
     @Override
     public void update(GameState state) {
-        Vector3 dir = new Vector3(state.getPlayer().getPosition())
+        if(life < 0) {
+            state.removeGameObject(this);
+        }
+
+        dir.set(state.getPlayer().getPosition())
             .sub(body.getCenterOfMassPosition())
             .nor();
 
-        tmpVector.set(dir);
-    
-        body.setLinearVelocity(tmpVector.scl(speed));
+        if(body.getLinearVelocity().len() < speed) {
+            body.applyCentralImpulse(tmpVector.set(dir).scl(speed));
+        }
+
+        tmpVector.set(body.getLinearVelocity());
+        tmpVector.y = 0;
+        body.setLinearVelocity(tmpVector);
+
         scene.modelInstance.transform.setToLookAt(dir, Vector3.Y).setTranslation(body.getCenterOfMassPosition());
     }
 

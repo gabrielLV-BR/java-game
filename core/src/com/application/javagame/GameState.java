@@ -45,6 +45,7 @@ public class GameState implements Disposable {
     public final ArrayList<GameObject> gameObjects;
     private final ArrayList<GameObject> gameObjectsToAdd;
     private final ArrayList<GameObject> gameObjectsToRemove;
+    private final ArrayList<Sprite> spritesToDraw;
 
     private Player player = null;
     public float delta;
@@ -57,6 +58,7 @@ public class GameState implements Disposable {
         decalBatch = new DecalBatch(new SimpleOrthoGroupStrategy());
         spriteBatch = new SpriteBatch();
 
+        spritesToDraw = new ArrayList<>();
         gameObjects = new ArrayList<>();
         gameObjectsToAdd = new ArrayList<>();
         gameObjectsToRemove = new ArrayList<>();
@@ -81,6 +83,7 @@ public class GameState implements Disposable {
         setupIBL();
 
         crosshair = new Sprite(Assets.<Texture>Get("crosshair.png"));
+        addSprite(crosshair);
         updateCrosshairPosition();
     }
 
@@ -133,6 +136,14 @@ public class GameState implements Disposable {
             sceneManager.removeScene(object.getScene());
     }
 
+    public void addSprite(Sprite s) {
+        spritesToDraw.add(s);
+    }
+
+    public void removeSprite(Sprite s) {
+        spritesToDraw.remove(s);
+    }
+
     public void update(float delta) {
         this.delta = delta;
 
@@ -162,7 +173,7 @@ public class GameState implements Disposable {
         decalBatch.flush();
 
         spriteBatch.begin();
-        crosshair.draw(spriteBatch);    
+        for(Sprite s : spritesToDraw) s.draw(spriteBatch);
         spriteBatch.end();
 
         physicsWorld.debug_render(sceneManager.camera);
@@ -183,7 +194,7 @@ public class GameState implements Disposable {
         manager.load("sphere.glb", SceneAsset.class);
         manager.load("map.glb", SceneAsset.class);
         manager.load("vesper.glb", SceneAsset.class);
-        manager.load("handgun.glb", SceneAsset.class);
+        manager.load("guns/handgun.png", Texture.class);
 
         manager.load("sounds/shotgun.mp3", Sound.class);
         manager.load("crosshair.png", Texture.class);

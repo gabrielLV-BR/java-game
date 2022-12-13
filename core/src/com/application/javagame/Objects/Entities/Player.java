@@ -12,6 +12,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
@@ -54,7 +55,7 @@ public class Player extends GameObject {
         body.setAngularFactor(0);
         body.translate(position);
 
-        weapon = new Handgun(2, 0.7f, 10);
+        weapon = new Handgun();
     }
 
     @Override
@@ -66,7 +67,7 @@ public class Player extends GameObject {
         state.addGameObject(this);
         state.physicsWorld.addBody(getBody());
 
-        weapon.register(state);
+        state.addSprite(weapon.getSprite());
     }
 
     public btRigidBody getBody() {
@@ -75,6 +76,10 @@ public class Player extends GameObject {
 
     public PerspectiveCamera getCamera() {
         return camera;
+    }
+    
+    public Vector3 getDirection() {
+        return tmpVector.set(camera.direction);
     }
 
     @Override
@@ -140,7 +145,8 @@ public class Player extends GameObject {
     }
 
     void fire(GameState state) {
-        // Ray ray = new Ray(camera.position, camera.direction);
+        Ray ray = new Ray(camera.position, camera.direction);
+        weapon.fire(ray, state);
     }
 
     // Getters
