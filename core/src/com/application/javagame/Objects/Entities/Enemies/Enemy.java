@@ -13,6 +13,7 @@ public abstract class Enemy extends GameObject {
     public float damage;
 
     protected btRigidBody body;
+    protected Vector3 dir;
 
     private final String NAME;
     private final int POINTS;
@@ -24,6 +25,10 @@ public abstract class Enemy extends GameObject {
 
         NAME = name;
         POINTS = points;
+
+        dir = new Vector3(0, 0, 0);
+
+        scene.animationController.action("ACTION",0, 10000, null, 0);
     }
 
     public void damage(float dmg) {

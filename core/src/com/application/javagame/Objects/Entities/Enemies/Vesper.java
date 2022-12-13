@@ -18,8 +18,6 @@ public class Vesper extends Enemy {
 
     private final float speed;
 
-    private Vector3 dir;
-
     public Vesper(Vector3 p) {
         super(NAME, Assets.<SceneAsset>Get("vesper.glb").scene, p, LIFE, DAMAGE, 2);
 
@@ -37,10 +35,6 @@ public class Vesper extends Enemy {
         body.setAngularFactor(0);
         body.translate(p);
         body.userData = this;
-
-        scene.animationController.action("ACTION", 10000, 1, null, 0);
-
-        dir = new Vector3();
     }
 
     @Override

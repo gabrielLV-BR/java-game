@@ -17,13 +17,10 @@ public class Crawler extends Enemy {
 
     private final float speed;
 
-    Vector3 dir;
-
     public Crawler(Vector3 p) {
         super(NAME, Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE, 10);
 
         speed = 20;
-        dir = new Vector3(0, 0, 0);
 
         BoundingBox bb = new BoundingBox();
         scene.modelInstance.calculateBoundingBox(bb);
@@ -37,8 +34,6 @@ public class Crawler extends Enemy {
         body.setAngularFactor(0);
         body.translate(p);
         body.userData = this;
-
-        scene.animationController.action("ACTION", 0, 100000, null, 0);
     }
 
     @Override

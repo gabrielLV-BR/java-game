@@ -2,6 +2,7 @@ package com.application.javagame;
 
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
+import com.application.javagame.Screens.MenuScreen;
 import com.application.javagame.Screens.PlayScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.physics.bullet.Bullet;
@@ -16,8 +17,9 @@ public class MyGame extends Game {
 		Assets.Initialize();
 		InputManager.Initialize();
 		// carrega a tela principal
-		GameState state = new GameState();
-		PlayScreen tela = new PlayScreen(state);
+		GameState state = new GameState(this);
+		// PlayScreen tela = new PlayScreen(state);
+		MenuScreen tela = new MenuScreen(state);
 		setScreen(tela);
 	}
 

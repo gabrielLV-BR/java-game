@@ -7,6 +7,7 @@ import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Managers.PhysicsWorld;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Objects.Entities.Player;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
@@ -50,13 +51,15 @@ public class GameState implements Disposable {
     private final ArrayList<GameObject> gameObjectsToRemove;
     private final ArrayList<Sprite> spritesToDraw;
 
+    public final Game game;
+
     private Player player = null;
     public float delta;
 
     private Sprite crosshair;
     private BitmapFont doomFont;
 
-    public GameState() {
+    public GameState(Game g) {
         delta = 0;
         physicsWorld = new PhysicsWorld();
         decalBatch = new DecalBatch(new SimpleOrthoGroupStrategy());
@@ -66,6 +69,8 @@ public class GameState implements Disposable {
         gameObjects = new ArrayList<>();
         gameObjectsToAdd = new ArrayList<>();
         gameObjectsToRemove = new ArrayList<>();
+
+        game = g;
 
         PBRShaderConfig shaderConfig = PBRShaderProvider.createDefaultConfig();
         shaderConfig.numBones = 60;
@@ -113,8 +118,8 @@ public void setPlayer(Player p ) {
 
     private void setupIBL() {
         DirectionalLightEx light = new DirectionalLightEx();
-        light.set(Color.WHITE, new Vector3(1, -1, 0).nor());
-        light.intensity = 10f;
+        light.set(Color.BLACK, new Vector3(1, -1, 0).nor());
+        light.intensity = 0.2f;
         sceneManager.environment.add(light);
 
         IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
@@ -190,8 +195,7 @@ public void setPlayer(Player p ) {
         doomFont.draw(spriteBatch, "POINTS: " + getPlayer().getPoints(), 10, Gdx.graphics.getHeight() - 20);
         spriteBatch.end();
 
-
-        physicsWorld.debug_render(sceneManager.camera);
+        // physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {
