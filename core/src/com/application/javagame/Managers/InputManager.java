@@ -78,14 +78,14 @@ public class InputManager implements Disposable, InputProcessor {
         if(inputMap.containsKey(keycode))
             inputMap.put(keycode, 1f);
 
-        return true;
+        return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
         if(inputMap.containsKey(keycode))
             inputMap.put(keycode, 0f);
-        return true;
+        return false;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class InputManager implements Disposable, InputProcessor {
         mouseState.delta.set(screenX, screenY).sub(prevMousePosition);
         prevMousePosition.set(screenX, screenY);
         mouseMoved = true;
-        return true;
+        return false;
     }
 
     public void update() {

@@ -41,6 +41,18 @@ public abstract class GameObject implements Disposable {
     //     return collisionObject;
     // }
 
+    protected ArrayList<Vector3> getSpawnPoints() {
+        ArrayList<Vector3> vectors = new ArrayList<>(5);
+
+        for (Node node : scene.modelInstance.nodes) {
+            if (node.id.startsWith("SPAWNPOINT")) {
+                vectors.add(node.translation);
+            }
+        }
+        vectors.trimToSize();
+        return vectors;
+    }
+
     protected ArrayList<Integer> getCollisionNodesIndexes() {
         int index = 0;
         ArrayList<Integer> indexes = new ArrayList<>(5);
@@ -54,6 +66,7 @@ public abstract class GameObject implements Disposable {
         indexes.trimToSize();
         return indexes;
     }
+
     protected btCollisionShape loadCollision() {
         btCollisionShape out = new btBoxShape(Vector3.Zero);
 

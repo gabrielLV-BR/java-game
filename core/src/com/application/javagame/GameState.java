@@ -2,11 +2,11 @@ package com.application.javagame;
 
 import java.util.ArrayList;
 
-import com.application.javagame.Managers.PhysicsWorld;
-import com.application.javagame.Objects.Entities.Player;
-import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
+import com.application.javagame.Managers.PhysicsWorld;
+import com.application.javagame.Objects.GameObject;
+import com.application.javagame.Objects.Entities.Player;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
@@ -14,8 +14,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.decals.SimpleOrthoGroupStrategy;
@@ -51,6 +54,7 @@ public class GameState implements Disposable {
     public float delta;
 
     private Sprite crosshair;
+    private BitmapFont doomFont;
 
     public GameState() {
         delta = 0;
@@ -85,12 +89,18 @@ public class GameState implements Disposable {
         crosshair = new Sprite(Assets.<Texture>Get("crosshair.png"));
         addSprite(crosshair);
         updateCrosshairPosition();
-    }
 
-    public void setPlayer(Player p ) {
-        this.player = p;
-        decalBatch.setGroupStrategy(new CameraGroupStrategy(p.getCamera()));
-    }
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/eternal.ttf"));
+        FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+
+        parameter.size = 12; // font size
+        doomFont = generator.generateFont(parameter);
+}
+
+public void setPlayer(Player p ) {
+    this.player = p;
+    decalBatch.setGroupStrategy(new CameraGroupStrategy(p.getCamera()));
+}
 
     public Player getPlayer() {
         return player;
@@ -145,6 +155,7 @@ public class GameState implements Disposable {
     }
 
     public void update(float delta) {
+        Assets.GetManager().update();
         this.delta = delta;
 
         if(!gameObjectsToAdd.isEmpty()) {
@@ -170,11 +181,15 @@ public class GameState implements Disposable {
         sceneManager.camera.update();
         sceneManager.update(delta);
         sceneManager.render();
+
+        Gdx.gl20.glDepthMask(false);
         decalBatch.flush();
 
         spriteBatch.begin();
         for(Sprite s : spritesToDraw) s.draw(spriteBatch);
+        doomFont.draw(spriteBatch, "POINTS: " + getPlayer().getPoints(), 10, Gdx.graphics.getHeight() - 20);
         spriteBatch.end();
+
 
         physicsWorld.debug_render(sceneManager.camera);
     }
@@ -186,19 +201,23 @@ public class GameState implements Disposable {
 
     private void preloadAssets() {
         AssetManager manager = Assets.GetManager(); 
+  
 		manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
-        manager.load("player.glb", SceneAsset.class);
-        manager.load("crawler.glb", SceneAsset.class);
-        manager.load("cube.glb", SceneAsset.class);
-        manager.load("sphere.glb", SceneAsset.class);
+        // manager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(fResolver));
+        // manager.setLoader(BitmapFont.class, ".ttf",  new FreetypeFontLoader(fResolver));
+
         manager.load("map.glb", SceneAsset.class);
+        manager.load("crawler.glb", SceneAsset.class);
         manager.load("vesper.glb", SceneAsset.class);
         manager.load("guns/handgun.png", Texture.class);
+        manager.load("guns/shotgun.png", Texture.class);
 
         manager.load("sounds/shotgun.mp3", Sound.class);
         manager.load("crosshair.png", Texture.class);
+        manager.load("hole.png", Texture.class);
         manager.load("explosion.png", Texture.class);
+        // manager.load("fonts/eternal.ttf", BitmapFont.class);
     }
 
     private void updateCrosshairPosition() {

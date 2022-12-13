@@ -20,6 +20,7 @@ public class Map extends GameObject {
     btRigidBody body;
 
     boolean usingShape = false;
+    public final ArrayList<Vector3> spawnPoints;
 
     public Map(String name, Vector3 p, float scale) {
         super(Assets.<SceneAsset>Get(name).scene, p);
@@ -27,20 +28,25 @@ public class Map extends GameObject {
 
         btCompoundShape compoundShape = new btCompoundShape();
         ArrayList<Integer> collisionShapesIndexes = getCollisionNodesIndexes();
+        spawnPoints = getSpawnPoints();
 
+        ArrayList<Node> toRemove = new ArrayList<>();
         for (int i : collisionShapesIndexes) {
             Node node = scene.modelInstance.nodes.get(i);
+            toRemove.add(node);
 
             btCollisionShape childShape = Bullet.obtainStaticNodeShape(
                 node, false
             );
-            
+
             childShape.setLocalScaling(node.scale.scl(scale));
             compoundShape.addChildShape(
                 new Matrix4().trn(node.translation), 
                 childShape
             );
         }
+
+        scene.modelInstance.nodes.removeRange(collisionShapesIndexes.get(0), collisionShapesIndexes.get(collisionShapesIndexes.size() - 1));
 
         shape = compoundShape;
 

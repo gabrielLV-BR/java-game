@@ -12,25 +12,28 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 
 
-public class Handgun extends Weapon {
+public class Shotgun extends Weapon {
     int bullets;
     boolean fired = false;
 
     Sound fireSound;
     Vector3 weaponOffset;
     static Texture txt = Assets.Get("explosion.png");;
-    public Handgun() {
+    public Shotgun() {
         super(
-            "Handgun", 
-            2, 0.5f, 8,
+            "Shotgun", 
+            5, 0.8f, 8,
             true
         );
 
         bullets = 3;
         fireSound = Assets.Get("sounds/shotgun.mp3");
 
-        Texture handgunSprites = Assets.Get("guns/handgun.png");
-        TextureRegion[][] regions = TextureRegion.split(handgunSprites, 80, 119);
+        Texture shotgunSprites = Assets.Get("guns/shotgun.png");
+        TextureRegion[][] regions = TextureRegion.split(shotgunSprites, shotgunSprites.getWidth() / 7, 132);
+
+        System.out.println("Cols: " + regions[0].length);
+        System.out.println("Rows: " + regions.length);
 
         weaponOffset = new Vector3(0, 0, 0);
 
@@ -39,15 +42,19 @@ public class Handgun extends Weapon {
             idleAnimation = new Animation<>(1, idleFrames);
         }
         {
-            int[] indices = new int[]{ 0, 2, 3, 4, 3 };
+            int[] indices = new int[]{ 1, 2, 3, 4, 4, 3, 3, 5 };
             TextureRegion[] fireFrames = new TextureRegion[indices.length];
+            System.out.println("Indices len: " + indices.length);
+            System.out.println("region size: " + fireFrames.length);
             for(int i = 0; i < indices.length; i++) fireFrames[i] = regions[0][indices[i]]; 
             fireAnimation = new Animation<>(MAX_FIRE_TIME / indices.length, fireFrames);
         }
         {
-            int[] indices = new int[]{ 5, 6, 7, 7, 7, 7, 7, 7, 6, 5 };
-            TextureRegion[] reloadFrames = new TextureRegion[indices.length];
-            for(int i = 0; i < indices.length; i++) reloadFrames[i] = regions[0][indices[i]]; 
+            int[] indicesRow = new int[] {};
+            int[] indicesCol = new int[] {};
+            TextureRegion[] reloadFrames = new TextureRegion[indicesRow.length];
+            for(int i = 0; i < indicesRow.length; i++) 
+                reloadFrames[i] = regions[indicesRow[i]][indicesCol[i]]; 
             reloadAnimation = new Animation<>(0.1f, reloadFrames);
         }
         currentAnimation = idleAnimation;
@@ -65,7 +72,7 @@ public class Handgun extends Weapon {
         }
 
         sprite.setBounds(0, 0, 180, 250);
-        sprite.setCenterX(Gdx.graphics.getWidth() / 2 - sprite.getWidth() / 4);
+        sprite.setCenterX(Gdx.graphics.getWidth() / 2);
         sprite.setRegionY(0);
         sprite.setRegion(currentAnimation.getKeyFrame(time, true));
     }
@@ -78,13 +85,18 @@ public class Handgun extends Weapon {
             return;
         }
         bullets--;
-        
-        currentAnimation = fireAnimation;
-        fired = true;
-        time = 0;
 
         fireSound.play(0.2f);
-        super.fire(ray, state);
+        for(int i = 0; i < 5; i++) {
+            Ray r = ray.cpy();
+            r.direction.add(tmpVector.setToRandomDirection().scl(0.2f));
+
+            currentAnimation = fireAnimation;
+            fired = true;
+            time = 0;
+
+            super.fire(r, state);
+        }
     }
 
     public void reload() {

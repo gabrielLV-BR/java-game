@@ -5,7 +5,6 @@ import com.application.javagame.Managers.Assets;
 import com.badlogic.gdx.math.Vector3;
 
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
@@ -17,27 +16,18 @@ public class Crawler extends Enemy {
     private static final float LIFE = 10;
 
     private final float speed;
-    btRigidBody body;
+
+    Vector3 dir;
 
     public Crawler(Vector3 p) {
-        super(NAME, Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE);
+        super(NAME, Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE, 10);
 
-        speed = 2000;
+        speed = 20;
+        dir = new Vector3(0, 0, 0);
 
-        int collisionShapeIndex = getCollisionNodesIndexes().get(0);
-        btCollisionShape shape;
-
-        if (collisionShapeIndex == -1) {
-            BoundingBox bb = new BoundingBox();
-            scene.modelInstance.calculateBoundingBox(bb);
-            shape = new btBoxShape(bb.getDimensions(tmpVector).scl(0.5f));
-        } else {
-            shape = Bullet.obtainStaticNodeShape(
-                    scene.modelInstance.nodes.get(collisionShapeIndex),
-                    false);
-            shape.setLocalScaling(tmpVector.set(1f, 1f, 1f));
-            scene.modelInstance.nodes.removeIndex(collisionShapeIndex);
-        }
+        BoundingBox bb = new BoundingBox();
+        scene.modelInstance.calculateBoundingBox(bb);
+        btCollisionShape shape = new btBoxShape(bb.getDimensions(tmpVector).scl(0.5f));
 
         float mass = 10f;
         Vector3 inertia = Vector3.Zero;
@@ -48,7 +38,7 @@ public class Crawler extends Enemy {
         body.translate(p);
         body.userData = this;
 
-        scene.animations.playAll(true);
+        scene.animationController.action("ACTION", 0, 100000, null, 0);
     }
 
     @Override
@@ -60,22 +50,22 @@ public class Crawler extends Enemy {
 
     @Override
     public void update(GameState state) {
+        if(life < 0) {
+            die(state);
+        }
 
-        Vector3 playerPos = state.getPlayer().getPosition();
-        Vector3 myPos = (body.getCenterOfMassPosition()).cpy();
+        dir.set(state.getPlayer().getPosition())
+            .sub(body.getCenterOfMassPosition())
+            .nor();
 
-        Vector3 toPlayer = tmpVector.set(playerPos).sub(myPos).nor().scl(1);
+        tmpVector.set(dir).scl(speed * 10);
+        tmpVector.y = body.getLinearVelocity().y;
+        body.setLinearVelocity(tmpVector);
 
-        /*
-         * Utils3D.printVector3("Player Position", playerPos);
-         * Utils3D.printVector3("My Position", myPos);
-         * Utils3D.printVector3("toPlayer", toPlayer);
-         * System.out.println("---------------");
-         */
-        scene.modelInstance.transform.setToLookAt(toPlayer, state.getPlayer().getCamera().up);
-        body.setLinearVelocity(new Vector3(toPlayer.x, body.getLinearVelocity().y, toPlayer.z));
+        scene.modelInstance.transform
+            .setToLookAt(state.getPlayer().getPosition(), Vector3.Y)
+            .setTranslation(body.getCenterOfMassPosition());
 
-        body.getWorldTransform(scene.modelInstance.transform);
         scene.animations.update(state.delta);
     }
 

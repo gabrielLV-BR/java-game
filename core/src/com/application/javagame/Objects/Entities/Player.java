@@ -4,11 +4,10 @@ import com.application.javagame.GameState;
 import com.application.javagame.Globals.Actions;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
-import com.application.javagame.Objects.Weapons.Handgun;
+import com.application.javagame.Objects.Weapons.Shotgun;
 import com.application.javagame.Objects.Weapons.Weapon;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -28,6 +27,8 @@ public class Player extends GameObject {
     float speed; // velocidade
     float mouseSensitivity; // sensitividade do mouse
     float yaw; // rotação horizontal da câmera
+
+    int points;
 
     public Player(Vector3 position) {
         super();
@@ -55,7 +56,16 @@ public class Player extends GameObject {
         body.setAngularFactor(0);
         body.translate(position);
 
-        weapon = new Handgun();
+        weapon = new Shotgun();
+        points = 0;
+    }
+
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
+    public int getPoints() {
+        return points;
     }
 
     @Override
@@ -87,14 +97,17 @@ public class Player extends GameObject {
         rotateCamera();
 
         move(state.delta);
-
-        if (InputManager.GetInputManager().getMouseState().button == Input.Buttons.LEFT) {
-            fire(state);
+ 
+        
+        if(weapon.IS_SINGLE_ACTION) {
+            if(Gdx.input.isButtonJustPressed(Buttons.LEFT)) fire(state);
+        } else {
+            if(Gdx.input.isButtonPressed(Buttons.LEFT)) fire(state);
         }
 
-        if(InputManager.GetInputManager().keyStrength(Keys.SPACE) > 0) {
-            body.applyCentralImpulse(tmpVector.set(Vector3.Y).scl(100));;
-        }
+        // if(InputManager.GetInputManager().keyStrength(Keys.SPACE) > 0) {
+        //     body.applyCentralImpulse(tmpVector.set(Vector3.Y).scl(100));;
+        // }
 
         weapon.update(state);
         camera.position.set(body.getCenterOfMassPosition());
@@ -111,13 +124,13 @@ public class Player extends GameObject {
         Vector3 movement = Vector3.Zero.setZero()
                 .add(camera.direction.cpy().scl(-input.z * delta * speed))
                 .add(camera.direction.cpy().crs(Vector3.Y).scl(input.x * delta * speed))
-                .scl(100);
+                .scl(200);
         movement.y = 0;
 
         if (!movement.equals(tmpVector.setZero())) {
             body.activate(true);
-            // body.setLinearVelocity(movement.set(movement.x, body.getLinearVelocity().y, movement.z));
-            body.applyCentralImpulse(movement);
+            body.setLinearVelocity(movement.set(movement.x, body.getLinearVelocity().y, movement.z));
+            // body.applyCentralImpulse(movement);
         } else {
             body.setLinearVelocity(tmpVector.set(0, body.getLinearVelocity().y, 0));
         }
