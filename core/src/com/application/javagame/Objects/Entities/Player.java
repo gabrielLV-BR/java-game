@@ -40,7 +40,7 @@ public class Player extends GameObject {
 
         acceleration = new Vector3(0, 0, 0);
 
-        speed = 80f;
+        speed = 50f;
         mouseSensitivity = 0.7f;
         yaw = 0f;
 

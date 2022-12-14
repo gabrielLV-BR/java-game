@@ -25,6 +25,7 @@ import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.decals.SimpleOrthoGroupStrategy;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
 import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
@@ -57,7 +58,7 @@ public class GameState implements Disposable {
     public float delta;
 
     private Sprite crosshair;
-    private BitmapFont doomFont;
+    private BitmapFont doomFont, doomFontBig;
 
     public GameState(Game g) {
         delta = 0;
@@ -100,12 +101,16 @@ public class GameState implements Disposable {
 
         parameter.size = 12; // font size
         doomFont = generator.generateFont(parameter);
-}
 
-public void setPlayer(Player p ) {
-    this.player = p;
-    decalBatch.setGroupStrategy(new CameraGroupStrategy(p.getCamera()));
-}
+        parameter.size = 24;
+        parameter.color = new Color(0.8f, 0.1f, 0.2f, 1);
+        doomFontBig = generator.generateFont(parameter);
+    }
+
+    public void setPlayer(Player p) {
+        this.player = p;
+        decalBatch.setGroupStrategy(new CameraGroupStrategy(p.getCamera()));
+    }
 
     public Player getPlayer() {
         return player;
@@ -180,6 +185,8 @@ public void setPlayer(Player p ) {
         }
     }
 
+    float timeLeft = 360;
+
     public void render() {
         Gdx.gl20.glClearColor(0, 0, 0, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -187,15 +194,19 @@ public void setPlayer(Player p ) {
         sceneManager.update(delta);
         sceneManager.render();
 
+        timeLeft -= delta;
+
         Gdx.gl20.glDepthMask(false);
         decalBatch.flush();
 
         spriteBatch.begin();
         for(Sprite s : spritesToDraw) s.draw(spriteBatch);
+
         doomFont.draw(spriteBatch, "POINTS: " + getPlayer().getPoints(), 10, Gdx.graphics.getHeight() - 20);
+        doomFontBig.draw(spriteBatch, "" + (int)timeLeft, Gdx.graphics.getWidth() / 2 - 35, Gdx.graphics.getHeight() - 20);
         spriteBatch.end();
 
-        // physicsWorld.debug_render(sceneManager.camera);
+        physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {
@@ -208,19 +219,25 @@ public void setPlayer(Player p ) {
   
 		manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
 		manager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
-        // manager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(fResolver));
-        // manager.setLoader(BitmapFont.class, ".ttf",  new FreetypeFontLoader(fResolver));
 
         manager.load("map.glb", SceneAsset.class);
+        manager.load("map2.glb", SceneAsset.class);
         manager.load("crawler.glb", SceneAsset.class);
         manager.load("vesper.glb", SceneAsset.class);
+        manager.load("door.glb", SceneAsset.class);
         manager.load("guns/handgun.png", Texture.class);
         manager.load("guns/shotgun.png", Texture.class);
 
-        manager.load("sounds/shotgun.mp3", Sound.class);
         manager.load("crosshair.png", Texture.class);
         manager.load("hole.png", Texture.class);
         manager.load("explosion.png", Texture.class);
+        manager.load("hellrise.png", Texture.class);
+        manager.load("hellrise black.png", Texture.class);
+        manager.load("white.png", Texture.class);
+
+        manager.load("sounds/shotgun.mp3", Sound.class);
+        manager.load("sounds/activate.mp3", Sound.class);
+        manager.load("sounds/next.mp3", Sound.class);
         // manager.load("fonts/eternal.ttf", BitmapFont.class);
     }
 

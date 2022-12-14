@@ -38,7 +38,7 @@ public class PhysicsWorld implements Disposable {
                 broadphaseInterface,
                 constraintSolver,
                 collisionConfiguration);
-        dynamicsWorld.setGravity(new Vector3(0, -10, 0));
+        dynamicsWorld.setGravity(new Vector3(0, -100, 0));
 
         //
         debugDrawer = new DebugDrawer();

@@ -37,6 +37,8 @@ public class Map extends GameObject {
 
             btCollisionShape childShape = Bullet.obtainStaticNodeShape(
                 node, false
+
+
             );
 
             childShape.setLocalScaling(node.scale.scl(scale));

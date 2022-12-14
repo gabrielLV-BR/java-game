@@ -3,7 +3,6 @@ package com.application.javagame;
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Screens.MenuScreen;
-import com.application.javagame.Screens.PlayScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.physics.bullet.Bullet;
 

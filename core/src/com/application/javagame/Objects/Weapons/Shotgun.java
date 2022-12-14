@@ -86,6 +86,8 @@ public class Shotgun extends Weapon {
         }
         bullets--;
 
+        super.fire(ray, state);
+
         fireSound.play(0.2f);
         for(int i = 0; i < 5; i++) {
             Ray r = ray.cpy();
