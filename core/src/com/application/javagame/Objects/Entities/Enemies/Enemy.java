@@ -1,10 +1,10 @@
 package com.application.javagame.Objects.Entities.Enemies;
 
 import com.application.javagame.GameState;
-import com.application.javagame.Objects.Explosion;
 import com.application.javagame.Objects.GameObject;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.application.javagame.Objects.Explosion;
 
 import net.mgsx.gltf.scene3d.scene.SceneModel;
 

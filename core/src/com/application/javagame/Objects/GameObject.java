@@ -58,6 +58,7 @@ public abstract class GameObject implements Disposable {
         ArrayList<Integer> indexes = new ArrayList<>(5);
 
         for (Node node : scene.modelInstance.nodes) {
+            System.out.println(node.id);
             if (node.id.startsWith("COLLISION")) {
                 indexes.add(index);
             }
@@ -65,6 +66,15 @@ public abstract class GameObject implements Disposable {
         }
         indexes.trimToSize();
         return indexes;
+    }
+
+    protected Node getGroundObject() {
+        for (Node node : scene.modelInstance.nodes) {
+            if (node.id.endsWith("GROUND")) {
+                return node;
+            }
+        }
+        return null;
     }
 
     protected btCollisionShape loadCollision() {

@@ -7,7 +7,10 @@ import com.application.javagame.Managers.Assets;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
@@ -15,6 +18,8 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Map extends GameObject {
+
+    btCollisionObject groundObject;
 
     btCollisionShape shape;
     btRigidBody body;
@@ -27,18 +32,16 @@ public class Map extends GameObject {
         scene.modelInstance.transform.scl(scale);
 
         btCompoundShape compoundShape = new btCompoundShape();
+        
+        Node ground = getGroundObject();
         ArrayList<Integer> collisionShapesIndexes = getCollisionNodesIndexes();
         spawnPoints = getSpawnPoints();
 
-        ArrayList<Node> toRemove = new ArrayList<>();
         for (int i : collisionShapesIndexes) {
             Node node = scene.modelInstance.nodes.get(i);
-            toRemove.add(node);
 
             btCollisionShape childShape = Bullet.obtainStaticNodeShape(
                 node, false
-
-
             );
 
             childShape.setLocalScaling(node.scale.scl(scale));
@@ -56,6 +59,17 @@ public class Map extends GameObject {
         body = new btRigidBody(mass, null, shape, Vector3.Zero);
         body.translate(p);
         body.userData = this;
+
+        if(ground != null) {
+            BoundingBox groundBB = new BoundingBox();
+            ground.calculateBoundingBox(groundBB);
+            groundBB.getDimensions(tmpVector);
+            btCollisionShape groundShape = new btBoxShape(
+                    tmpVector.scl(0.5f));
+
+            groundObject = new btCollisionObject();
+            groundObject.setCollisionShape(groundShape);
+        }
     }
 
     @Override
@@ -63,6 +77,9 @@ public class Map extends GameObject {
         // registration
         state.addGameObject(this);
         state.physicsWorld.addBody(getBody());
+
+        if(groundObject != null)
+            state.physicsWorld.setGround(groundObject);
     }
 
     public btRigidBody getBody() {

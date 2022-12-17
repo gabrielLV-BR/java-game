@@ -22,6 +22,7 @@ public class PlayScreen extends ScreenAdapter {
 
         Map map = new Map("map2.glb", new Vector3(0, 0, 0), 1);
         map.register(s);
+        System.out.println("Ground is: " + state.physicsWorld.getGround());
 
         new Wall(map.spawnPoints.get(1), 1).register(s);
 

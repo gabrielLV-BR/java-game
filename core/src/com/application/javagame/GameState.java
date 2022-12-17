@@ -206,7 +206,7 @@ public class GameState implements Disposable {
         doomFontBig.draw(spriteBatch, "" + (int)timeLeft, Gdx.graphics.getWidth() / 2 - 35, Gdx.graphics.getHeight() - 20);
         spriteBatch.end();
 
-        physicsWorld.debug_render(sceneManager.camera);
+        // physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {

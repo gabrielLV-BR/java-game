@@ -48,7 +48,6 @@ public class Wall extends GameObject {
     public void update(GameState state) {
         time += state.delta;
 
-        System.out.println(time);
         if(time > 4) {
             body.setWorldTransform(new Matrix4().translate(body.getCenterOfMassPosition().add(new Vector3(0, 0.7f, 0))));
         } 

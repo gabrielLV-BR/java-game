@@ -4,10 +4,13 @@ import com.application.javagame.GameState;
 import com.application.javagame.Globals.Actions;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
+import com.application.javagame.Objects.Weapons.Handgun;
 import com.application.javagame.Objects.Weapons.Shotgun;
 import com.application.javagame.Objects.Weapons.Weapon;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.ai.steer.limiters.FullLimiter;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -29,6 +32,9 @@ public class Player extends GameObject {
     float yaw; // rotação horizontal da câmera
 
     int points;
+
+    final float MAX_JETPACK_FUEL;
+    float jetpackFuel;
 
     public Player(Vector3 position) {
         super();
@@ -56,8 +62,12 @@ public class Player extends GameObject {
         body.setAngularFactor(0);
         body.translate(position);
 
-        weapon = new Shotgun();
+        weapon = new Handgun();
         points = 0;
+
+        MAX_JETPACK_FUEL = 0.6f;
+        jetpackFuel = MAX_JETPACK_FUEL;
+
     }
 
     public void addPoints(int points) {
@@ -111,6 +121,12 @@ public class Player extends GameObject {
 
         weapon.update(state);
         camera.position.set(body.getCenterOfMassPosition());
+
+        if(state.physicsWorld.IsGrounded(body)) {
+            System.out.println("Tô no chão");
+        } else {
+            System.out.println("VOANDO");
+        }
     }
 
     private void move(float delta) {
@@ -133,6 +149,16 @@ public class Player extends GameObject {
             // body.applyCentralImpulse(movement);
         } else {
             body.setLinearVelocity(tmpVector.set(0, body.getLinearVelocity().y, 0));
+        }
+
+        if(Gdx.input.isKeyPressed(Keys.SPACE) && jetpackFuel > 0) {
+            System.out.println("JETPACK");
+            body.applyCentralImpulse(tmpVector.set(0, 900, 0));
+            
+            jetpackFuel -= delta;
+        } else {
+            jetpackFuel += delta;
+            if(jetpackFuel > MAX_JETPACK_FUEL) jetpackFuel = MAX_JETPACK_FUEL;
         }
 
         body.setAngularVelocity(tmpVector.setZero());
