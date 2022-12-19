@@ -53,6 +53,13 @@ public abstract class GameObject implements Disposable {
         return vectors;
     }
 
+    protected Node searchForNode(String name) {
+        for(Node node : scene.modelInstance.nodes) {
+            if(node.id.equals(name)) return node;
+        }
+        return null;
+    }
+
     protected ArrayList<Integer> getCollisionNodesIndexes() {
         int index = 0;
         ArrayList<Integer> indexes = new ArrayList<>(5);

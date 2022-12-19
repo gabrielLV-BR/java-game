@@ -6,7 +6,9 @@ import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Managers.PhysicsWorld;
 import com.application.javagame.Objects.GameObject;
+import com.application.javagame.Objects.Map;
 import com.application.javagame.Objects.Entities.Player;
+import com.application.javagame.Objects.Entities.Enemies.Enemy;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -20,15 +22,18 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.decals.SimpleOrthoGroupStrategy;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
 import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
+import net.mgsx.gltf.scene3d.attributes.FogAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
 import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
@@ -54,13 +59,27 @@ public class GameState implements Disposable {
 
     public final Game game;
 
+    public int points;
+    public int survivedRounds;
+
     private Player player = null;
     public float delta;
+
+    private float timeLeft;
+    private final float ROUND_TIME;
+
+    private Map map;
 
     private Sprite crosshair;
     private BitmapFont doomFont, doomFontBig;
 
     public GameState(Game g) {
+        points = 0;
+        survivedRounds = 0;
+
+        ROUND_TIME = 10;
+        timeLeft = ROUND_TIME;
+
         delta = 0;
         physicsWorld = new PhysicsWorld();
         decalBatch = new DecalBatch(new SimpleOrthoGroupStrategy());
@@ -116,6 +135,14 @@ public class GameState implements Disposable {
         return player;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
     private void configSceneManager() {
         sceneManager.setAmbientLight(0.3f);
         sceneManager.updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -136,12 +163,24 @@ public class GameState implements Disposable {
         Texture brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
 
         sceneManager.setAmbientLight(1f);
+        
+        sceneManager.environment.set(FogAttribute.createFog(0, 10, 6));
         sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT));
         sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseMap));
         sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularMap));
 
         SceneSkybox skybox = new SceneSkybox(environmentMap);
         sceneManager.setSkyBox(skybox);
+    }
+
+    public void newRound() {
+        survivedRounds++;
+        timeLeft = ROUND_TIME;
+
+        for(GameObject object : gameObjects) {
+            if(object instanceof Enemy)
+             ((Enemy) object).die(this);
+        }
     }
 
     public void addGameObject(GameObject object) {
@@ -180,12 +219,17 @@ public class GameState implements Disposable {
 
         physicsWorld.update(delta);
 
+        if(
+            map.getElevatorBoundingBox().contains(player.getPosition()) &&
+            timeLeft <= 0.01
+        ) {
+            newRound();
+        }
+
         for (GameObject object : gameObjects) {
             object.update(this);
         }
     }
-
-    float timeLeft = 360;
 
     public void render() {
         Gdx.gl20.glClearColor(0, 0, 0, 1);
@@ -202,11 +246,19 @@ public class GameState implements Disposable {
         spriteBatch.begin();
         for(Sprite s : spritesToDraw) s.draw(spriteBatch);
 
-        doomFont.draw(spriteBatch, "POINTS: " + getPlayer().getPoints(), 10, Gdx.graphics.getHeight() - 20);
-        doomFontBig.draw(spriteBatch, "" + (int)timeLeft, Gdx.graphics.getWidth() / 2 - 35, Gdx.graphics.getHeight() - 20);
+        doomFont.draw(spriteBatch, "POINTS: " + getPoints(), 10, Gdx.graphics.getHeight() - 20);
+
+        if (timeLeft > 0) {
+            doomFontBig.draw(spriteBatch, "" + (int) timeLeft, Gdx.graphics.getWidth() / 2 - 35,
+                    Gdx.graphics.getHeight() - 20);
+        } else {
+            doomFontBig.draw(spriteBatch, "VOLTE PRO ELEVADOR", Gdx.graphics.getWidth() / 2 - 55,
+                    Gdx.graphics.getHeight() - 20);
+        }
+
         spriteBatch.end();
 
-        // physicsWorld.debug_render(sceneManager.camera);
+        physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {
@@ -235,8 +287,9 @@ public class GameState implements Disposable {
         manager.load("hellrise black.png", Texture.class);
         manager.load("white.png", Texture.class);
 
+        manager.load("sounds/pistol.mp3", Sound.class);
+        manager.load("sounds/pistol_reload.mp3", Sound.class);
         manager.load("sounds/shotgun.mp3", Sound.class);
-        manager.load("sounds/activate.mp3", Sound.class);
         manager.load("sounds/next.mp3", Sound.class);
         // manager.load("fonts/eternal.ttf", BitmapFont.class);
     }
@@ -259,5 +312,24 @@ public class GameState implements Disposable {
         decalBatch.dispose();
         sceneManager.dispose();
         physicsWorld.dispose();
+    }
+    public Game getGame() {
+        return game;
+    }
+
+    public float getDelta() {
+        return delta;
+    }
+
+    public void setDelta(float delta) {
+        this.delta = delta;
+    }
+
+    public Map getMap() {
+        return map;
+    }
+
+    public void setMap(Map map) {
+        this.map = map;
     }
 }

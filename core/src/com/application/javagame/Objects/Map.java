@@ -21,6 +21,8 @@ public class Map extends GameObject {
 
     btCollisionObject groundObject;
 
+    BoundingBox elevatorBoundingBox;
+
     btCollisionShape shape;
     btRigidBody body;
 
@@ -34,6 +36,13 @@ public class Map extends GameObject {
         btCompoundShape compoundShape = new btCompoundShape();
         
         Node ground = getGroundObject();
+
+        Node elevatorNode = searchForNode("ELEVATOR");
+        if (elevatorNode != null) {
+            elevatorBoundingBox = new BoundingBox();
+            elevatorNode.calculateBoundingBox(elevatorBoundingBox);
+        }
+
         ArrayList<Integer> collisionShapesIndexes = getCollisionNodesIndexes();
         spawnPoints = getSpawnPoints();
 
@@ -52,6 +61,7 @@ public class Map extends GameObject {
         }
 
         scene.modelInstance.nodes.removeRange(collisionShapesIndexes.get(0), collisionShapesIndexes.get(collisionShapesIndexes.size() - 1));
+        scene.modelInstance.nodes.removeValue(elevatorNode, true);
 
         shape = compoundShape;
 
@@ -77,6 +87,7 @@ public class Map extends GameObject {
         // registration
         state.addGameObject(this);
         state.physicsWorld.addBody(getBody());
+        state.setMap(this);
 
         if(groundObject != null)
             state.physicsWorld.setGround(groundObject);
@@ -84,6 +95,10 @@ public class Map extends GameObject {
 
     public btRigidBody getBody() {
         return body;
+    }
+
+    public BoundingBox getElevatorBoundingBox() {
+        return elevatorBoundingBox;
     }
 
     @Override

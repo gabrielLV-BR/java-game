@@ -3,7 +3,7 @@ package com.application.javagame.Screens;
 import com.application.javagame.GameState;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.Map;
-import com.application.javagame.Objects.Wall;
+import com.application.javagame.Objects.Door;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.Entities.Enemies.Crawler;
 import com.application.javagame.Objects.Entities.Enemies.Vesper;
@@ -20,11 +20,11 @@ public class PlayScreen extends ScreenAdapter {
 
         Gdx.input.setInputProcessor(InputManager.GetInputManager());
 
-        Map map = new Map("map2.glb", new Vector3(0, 0, 0), 1);
+        Map map = new Map("map.glb", new Vector3(0, 0, 0), 1);
         map.register(s);
         System.out.println("Ground is: " + state.physicsWorld.getGround());
 
-        new Wall(map.spawnPoints.get(1), 1).register(s);
+        new Door(map.spawnPoints.get(1), 1).register(s);
 
         new Player(map.spawnPoints.get(0))
             .register(state);
@@ -35,9 +35,8 @@ public class PlayScreen extends ScreenAdapter {
         
         new Vesper(new Vector3(20, 10, 0))
             .register(state);
-
-    
     }
+
     @Override
     public void render(float delta) {
         state.update(delta);

@@ -14,6 +14,7 @@ import com.badlogic.gdx.ai.steer.limiters.FullLimiter;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
@@ -30,8 +31,6 @@ public class Player extends GameObject {
     float speed; // velocidade
     float mouseSensitivity; // sensitividade do mouse
     float yaw; // rotação horizontal da câmera
-
-    int points;
 
     final float MAX_JETPACK_FUEL;
     float jetpackFuel;
@@ -51,7 +50,7 @@ public class Player extends GameObject {
         yaw = 0f;
 
         float mass = 90f;
-        float radius = 4f;
+        float radius = 3f;
 
         btCollisionShape shape = new btCylinderShape(new Vector3(radius, radius * 2, radius));
 
@@ -63,19 +62,9 @@ public class Player extends GameObject {
         body.translate(position);
 
         weapon = new Handgun();
-        points = 0;
 
         MAX_JETPACK_FUEL = 0.6f;
         jetpackFuel = MAX_JETPACK_FUEL;
-
-    }
-
-    public void addPoints(int points) {
-        this.points += points;
-    }
-
-    public int getPoints() {
-        return points;
     }
 
     @Override
@@ -107,26 +96,14 @@ public class Player extends GameObject {
         rotateCamera();
 
         move(state.delta);
- 
         
         if(weapon.IS_SINGLE_ACTION) {
             if(Gdx.input.isButtonJustPressed(Buttons.LEFT)) fire(state);
         } else {
             if(Gdx.input.isButtonPressed(Buttons.LEFT)) fire(state);
         }
-
-        // if(InputManager.GetInputManager().keyStrength(Keys.SPACE) > 0) {
-        //     body.applyCentralImpulse(tmpVector.set(Vector3.Y).scl(100));;
-        // }
-
         weapon.update(state);
         camera.position.set(body.getCenterOfMassPosition());
-
-        if(state.physicsWorld.IsGrounded(body)) {
-            System.out.println("Tô no chão");
-        } else {
-            System.out.println("VOANDO");
-        }
     }
 
     private void move(float delta) {
@@ -140,7 +117,7 @@ public class Player extends GameObject {
         Vector3 movement = Vector3.Zero.setZero()
                 .add(camera.direction.cpy().scl(-input.z * delta * speed))
                 .add(camera.direction.cpy().crs(Vector3.Y).scl(input.x * delta * speed))
-                .scl(200);
+                .scl(170);
         movement.y = 0;
 
         if (!movement.equals(tmpVector.setZero())) {
@@ -152,7 +129,7 @@ public class Player extends GameObject {
         }
 
         if(Gdx.input.isKeyPressed(Keys.SPACE) && jetpackFuel > 0) {
-            System.out.println("JETPACK");
+            // System.out.println("JETPACK");
             body.applyCentralImpulse(tmpVector.set(0, 900, 0));
             
             jetpackFuel -= delta;
@@ -161,7 +138,6 @@ public class Player extends GameObject {
             if(jetpackFuel > MAX_JETPACK_FUEL) jetpackFuel = MAX_JETPACK_FUEL;
         }
 
-        body.setAngularVelocity(tmpVector.setZero());
     }
 
     /*

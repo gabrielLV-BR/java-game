@@ -6,12 +6,11 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
-public class Wall extends GameObject {
+public class Door extends GameObject {
 
     btRigidBody body;
 
@@ -19,7 +18,7 @@ public class Wall extends GameObject {
 
     float time = 0;
 
-    public Wall(Vector3 p, float scale) {
+    public Door(Vector3 p, float scale) {
         super(Assets.<SceneAsset>Get("door.glb").scene, p);
         scene.modelInstance.transform.scl(scale);
 

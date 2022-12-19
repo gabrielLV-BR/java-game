@@ -16,7 +16,7 @@ public class Handgun extends Weapon {
     int bullets;
     boolean fired = false;
 
-    Sound fireSound;
+    Sound fireSound, reloadSound;
     Vector3 weaponOffset;
     static Texture txt = Assets.Get("explosion.png");;
     public Handgun() {
@@ -27,7 +27,8 @@ public class Handgun extends Weapon {
         );
 
         bullets = 3;
-        fireSound = Assets.Get("sounds/shotgun.mp3");
+        fireSound = Assets.Get("sounds/pistol.mp3");
+        reloadSound = Assets.Get("sounds/pistol_reload.mp3");
 
         Texture handgunSprites = Assets.Get("guns/handgun.png");
         TextureRegion[][] regions = TextureRegion.split(handgunSprites, 80, 119);
@@ -89,6 +90,7 @@ public class Handgun extends Weapon {
 
     public void reload() {
         System.out.println("RELOADING");
+        reloadSound.play();
         bullets = BULLETS_IN_MAG;
         currentAnimation = reloadAnimation;
         time = 0;

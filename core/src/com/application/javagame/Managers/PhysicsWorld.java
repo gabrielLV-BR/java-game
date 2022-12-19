@@ -1,20 +1,24 @@
 package com.application.javagame.Managers;
 
-import com.badlogic.gdx.ai.utils.Collision;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
+import com.badlogic.gdx.physics.bullet.collision.CollisionObjectWrapper;
 import com.badlogic.gdx.physics.bullet.collision.ContactResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionAlgorithm;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btDispatcher;
+import com.badlogic.gdx.physics.bullet.collision.btDispatcherInfo;
+import com.badlogic.gdx.physics.bullet.collision.btManifoldResult;
+import com.badlogic.gdx.physics.bullet.collision.btPersistentManifold;
+import com.badlogic.gdx.physics.bullet.collision.ebtDispatcherQueryType;
 import com.badlogic.gdx.physics.bullet.dynamics.btActionInterface;
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
@@ -22,13 +26,11 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
 import com.badlogic.gdx.utils.Disposable;
 
 public class PhysicsWorld implements Disposable {
 
     public final btDynamicsWorld dynamicsWorld;
-    private final btCollisionWorld collisionWorld;
 
     private final btCollisionConfiguration collisionConfiguration;
     private final btDispatcher dispatcher;
@@ -43,9 +45,14 @@ public class PhysicsWorld implements Disposable {
     private static final Vector3 rayFrom = new Vector3();
     private static final Vector3 rayTo = new Vector3();
     private static ClosestRayResultCallback callback;
-    private ContactResultCallback contactResultCallback;
 
     private btCollisionObject ground;
+
+    CollisionObjectWrapper co0, co1;
+    btCollisionAlgorithm algorithm;
+    btDispatcherInfo info;
+    btManifoldResult result;
+    btPersistentManifold man;
 
     public PhysicsWorld() {
         collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -53,19 +60,15 @@ public class PhysicsWorld implements Disposable {
 
         broadphaseInterface = new btDbvtBroadphase();
         constraintSolver = new btSequentialImpulseConstraintSolver();
+        
         dynamicsWorld = new btDiscreteDynamicsWorld(
                 dispatcher,
                 broadphaseInterface,
                 constraintSolver,
                 collisionConfiguration);
+
+        dynamicsWorld.setForceUpdateAllAabbs(true);
         dynamicsWorld.setGravity(new Vector3(0, -100, 0));
-
-        collisionWorld = new btCollisionWorld(
-                dispatcher,
-                broadphaseInterface,
-                collisionConfiguration);
-
-        contactResultCallback = new ContactResultCallback();
         //
         debugDrawer = new DebugDrawer();
         debugDrawer.setDebugMode(btIDebugDraw.DebugDrawModes.DBG_DrawWireframe);
@@ -73,7 +76,7 @@ public class PhysicsWorld implements Disposable {
     }
 
     public void update(float delta) {
-        dynamicsWorld.stepSimulation(delta);
+        dynamicsWorld.stepSimulation(delta, 6);
     }
 
     public void setGround(btCollisionObject ground) {
@@ -106,24 +109,48 @@ public class PhysicsWorld implements Disposable {
         dynamicsWorld.removeAction(action);
     }
 
-    public boolean IsGrounded(btRigidBody body) {
-        if(ground == null) return false;
+    public boolean isGrounded(btCollisionObject obj) {
+        return ground != null && checkCollision(obj, ground);
+    } 
 
-        collisionWorld.addCollisionObject(body);
-        collisionWorld.addCollisionObject(ground);
+    /*
+     * Código pego daqui -> https://github.com/JamesTKhan/libgdx-bullet-tutorials/blob/master/core/src/com/jpcodes/physics/screens/BasicCollisionDetection.java
+     * Alterado um pouco
+     */
+    public boolean checkCollision (btCollisionObject b1, btCollisionObject b2) {
 
-        // Executa o teste de contato entre o corpo rígido 1 e todos os outros corpos
-        // rígidos
+        co0 = new CollisionObjectWrapper(b1);
+        co1 = new CollisionObjectWrapper(b2);
 
-        collisionWorld.contactPairTest(body, ground, contactResultCallback);
+        // For each pair of shape types, Bullet will dispatch a certain collision algorithm, by using the dispatcher.
+        // So we use the dispatcher here to find the algorithm needed for the two shape types being checked, ex. btSphereBoxCollisionAlgorithm
+        algorithm = dispatcher.findAlgorithm(
+            co0.wrapper, 
+            co1.wrapper, 
+            null,
+            ebtDispatcherQueryType.BT_CONTACT_POINT_ALGORITHMS
+        );
 
-        boolean hasCollided = callback.hasHit() && 
-            callback.getCollisionObject().equals(body);
+        info = new btDispatcherInfo();
+        result = new btManifoldResult(co0.wrapper, co1.wrapper);
 
-        collisionWorld.removeCollisionObject(body);
-        collisionWorld.removeCollisionObject(ground);
-        
-        return hasCollided;
+        // Execute the algorithm using processCollision, this stores the result (the contact points) in the btManifoldResult
+        algorithm.processCollision(co0.wrapper, co1.wrapper, info, result);
+
+        // Free the algorithm back to a pool for reuse later
+        dispatcher.freeCollisionAlgorithm(algorithm.getCPointer());
+
+        boolean r = false;
+
+        // btPersistentManifold is a contact point cache to store contact points for a given pair of objects.
+        man = result.getPersistentManifold();
+        if (man != null) {
+            // If the number of contact points is more than zero, then there is a collision.
+            r = man.getNumContacts() > 0;
+        }
+        System.out.println("Num contacts: " + man.getNumContacts());
+
+        return r;
     }
 
     /*
@@ -145,6 +172,10 @@ public class PhysicsWorld implements Disposable {
     }
 
     public void dispose() {
+        result.dispose();
+        info.dispose();
+        co1.dispose();
+        co0.dispose();
         broadphaseInterface.dispose();
         callback.dispose();
         collisionConfiguration.dispose();

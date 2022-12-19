@@ -1,12 +1,8 @@
 package com.application.javagame.Screens;
 
-import javax.swing.text.AttributeSet.FontAttribute;
-
 import com.application.javagame.GameState;
 import com.application.javagame.Managers.Assets;
-import com.application.javagame.Managers.InputManager;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
@@ -16,16 +12,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -53,7 +45,6 @@ public class MenuScreen extends ScreenAdapter {
     public MenuScreen(GameState s) {
         state = s;
 
-        activeBig = Assets.Get("sounds/activate.mp3");
         active = Assets.Get("sounds/next.mp3");
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -119,8 +110,7 @@ public class MenuScreen extends ScreenAdapter {
 
         if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
             menuClicks++;
-            if(menuClicks == 1) activeBig.play();
-            else if (menuClicks < maxMenuClicks - 1) active.play();
+            if (menuClicks < maxMenuClicks - 1) active.play();
             else state.game.setScreen(new PlayScreen(state));
         }
     }
