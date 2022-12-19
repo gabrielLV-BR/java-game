@@ -3,6 +3,7 @@ package com.application.javagame;
 import java.util.ArrayList;
 
 import com.application.javagame.Managers.Assets;
+import com.application.javagame.Managers.EnemySpawner;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Managers.PhysicsWorld;
 import com.application.javagame.Objects.GameObject;
@@ -61,6 +62,8 @@ public class GameState implements Disposable {
 
     public int points;
     public int survivedRounds;
+    private String statusMessage;
+    private boolean restarting;
 
     private Player player = null;
     public float delta;
@@ -73,12 +76,15 @@ public class GameState implements Disposable {
     private Sprite crosshair;
     private BitmapFont doomFont, doomFontBig;
 
+    private EnemySpawner enemySpawner;
+
     public GameState(Game g) {
         points = 0;
         survivedRounds = 0;
 
-        ROUND_TIME = 10;
+        ROUND_TIME = 15;
         timeLeft = ROUND_TIME;
+        restarting = false;
 
         delta = 0;
         physicsWorld = new PhysicsWorld();
@@ -91,6 +97,8 @@ public class GameState implements Disposable {
         gameObjectsToRemove = new ArrayList<>();
 
         game = g;
+
+        enemySpawner = new EnemySpawner();
 
         PBRShaderConfig shaderConfig = PBRShaderProvider.createDefaultConfig();
         shaderConfig.numBones = 60;
@@ -124,6 +132,14 @@ public class GameState implements Disposable {
         parameter.size = 24;
         parameter.color = new Color(0.8f, 0.1f, 0.2f, 1);
         doomFontBig = generator.generateFont(parameter);
+    }
+
+    public int getRemainingEnemies() {
+        int count = 0;
+        for(GameObject obj : gameObjects) {
+            if(obj instanceof Enemy) count++;
+        }
+        return count;
     }
 
     public void setPlayer(Player p) {
@@ -176,6 +192,7 @@ public class GameState implements Disposable {
     public void newRound() {
         survivedRounds++;
         timeLeft = ROUND_TIME;
+        map.ready();
 
         for(GameObject object : gameObjects) {
             if(object instanceof Enemy)
@@ -219,16 +236,20 @@ public class GameState implements Disposable {
 
         physicsWorld.update(delta);
 
-        if(
-            map.getElevatorBoundingBox().contains(player.getPosition()) &&
-            timeLeft <= 0.01
-        ) {
-            newRound();
-        }
+        timeLeft -= delta;
+        
+        statusMessage = "" + (int) timeLeft; 
+
+        if(timeLeft <= 0.01f) {
+            handleRestart();
+        } 
 
         for (GameObject object : gameObjects) {
             object.update(this);
         }
+
+        enemySpawner.update(this);
+        System.out.println("Inimigos: " + getRemainingEnemies());
     }
 
     public void render() {
@@ -238,8 +259,6 @@ public class GameState implements Disposable {
         sceneManager.update(delta);
         sceneManager.render();
 
-        timeLeft -= delta;
-
         Gdx.gl20.glDepthMask(false);
         decalBatch.flush();
 
@@ -248,17 +267,17 @@ public class GameState implements Disposable {
 
         doomFont.draw(spriteBatch, "POINTS: " + getPoints(), 10, Gdx.graphics.getHeight() - 20);
 
-        if (timeLeft > 0) {
-            doomFontBig.draw(spriteBatch, "" + (int) timeLeft, Gdx.graphics.getWidth() / 2 - 35,
-                    Gdx.graphics.getHeight() - 20);
-        } else {
-            doomFontBig.draw(spriteBatch, "VOLTE PRO ELEVADOR", Gdx.graphics.getWidth() / 2 - 55,
-                    Gdx.graphics.getHeight() - 20);
-        }
+        doomFontBig.draw(
+            spriteBatch, 
+            statusMessage, 
+            Gdx.graphics.getWidth() / 2 - (statusMessage.length() * 10),
+
+            Gdx.graphics.getHeight() - 20
+        );
 
         spriteBatch.end();
 
-        physicsWorld.debug_render(sceneManager.camera);
+        // physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {
@@ -292,6 +311,23 @@ public class GameState implements Disposable {
         manager.load("sounds/shotgun.mp3", Sound.class);
         manager.load("sounds/next.mp3", Sound.class);
         // manager.load("fonts/eternal.ttf", BitmapFont.class);
+    }
+
+    public void handleRestart() {
+        if (!restarting) {
+            if (map.getElevatorBoundingBox().contains(player.getPosition())) {
+                map.reset();
+                statusMessage = "ROUND " + (survivedRounds + 1);
+                timeLeft = 6;
+                restarting = true;
+            } else {
+                statusMessage = "VOLTE PRO ELEVADOR";
+            }
+        } else {
+            restarting = false;
+            statusMessage = "GO!";
+            newRound();
+        } 
     }
 
     private void updateCrosshairPosition() {
@@ -331,5 +367,6 @@ public class GameState implements Disposable {
 
     public void setMap(Map map) {
         this.map = map;
+        enemySpawner.setSpawnpoints(map.spawnPoints.subList(2, map.spawnPoints.size() -1));
     }
 }

@@ -28,6 +28,7 @@ public class Map extends GameObject {
 
     boolean usingShape = false;
     public final ArrayList<Vector3> spawnPoints;
+    Door door;
 
     public Map(String name, Vector3 p, float scale) {
         super(Assets.<SceneAsset>Get(name).scene, p);
@@ -91,6 +92,10 @@ public class Map extends GameObject {
 
         if(groundObject != null)
             state.physicsWorld.setGround(groundObject);
+        
+        door = new Door(spawnPoints.get(1), 1);
+        door.register(state);
+        door.open(8);
     }
 
     public btRigidBody getBody() {
@@ -105,29 +110,12 @@ public class Map extends GameObject {
     public void update(GameState state) {
         // body.getWorldTransform(scene.modelInstance.transform);
     }
-}
 
-/*
- * 
- * for(int collisionShapeIndex : collisionShapesIndexes) {
- * 
- * Node node = scene.modelInstance.nodes.get(collisionShapeIndex);
- * btCollisionShape childShape = Bullet.obtainStaticNodeShape(
- * node, false
- * );
- * 
- * System.out.print("Child shape #" + collisionShapeIndex + "is ");
- * System.out.println(childShape.isConvex() ? "convex (GOOD)" :
- * "concave (BAD)");
- * compoundShape.addChildShape(node.localTransform.scl(size), childShape);
- * scene.modelInstance.nodes.removeIndex(collisionShapeIndex);
- * }
- * 
- * shape = compoundShape;
- * 
- * System.out.println("Shape is compound with " +
- * compoundShape.getNumChildShapes()
- * + " children");
- * }
- * 
- */
+    public void ready() {
+        door.open(1);
+    }
+
+    public void reset() {
+        door.close(0);
+    }
+}

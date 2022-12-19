@@ -1,6 +1,5 @@
 buildscript {
     
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -39,6 +38,7 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
+        maven { url "https://jar-download.com/" }
     }
 }
 
@@ -79,13 +79,14 @@ project(":html") {
 project(":core") {
     apply plugin: "java-library"
 
-
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
-        api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion"    
+        api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion"
+    
+        implementation 'org.xerial:sqlite-jdbc:3.30.1'
     }
 }

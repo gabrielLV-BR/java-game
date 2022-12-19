@@ -20,13 +20,10 @@ public class PlayScreen extends ScreenAdapter {
 
         Gdx.input.setInputProcessor(InputManager.GetInputManager());
 
-        Map map = new Map("map.glb", new Vector3(0, 0, 0), 1);
-        map.register(s);
-        System.out.println("Ground is: " + state.physicsWorld.getGround());
+        new Map("map.glb", new Vector3(0, 0, 0), 1)
+            .register(state);;
 
-        new Door(map.spawnPoints.get(1), 1).register(s);
-
-        new Player(map.spawnPoints.get(0))
+        new Player(state.getMap().spawnPoints.get(0))
             .register(state);
 
         // Loading level

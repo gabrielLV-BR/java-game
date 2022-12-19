@@ -61,6 +61,7 @@ public class MenuScreen extends ScreenAdapter {
         stage.addActor(stack);
 
         Image image = new Image(Assets.<Texture>Get("hellrise black.png"));       
+        
         Image white = new Image(Assets.<Texture>Get("white.png"));       
         Table table = new Table();
         table.setWidth(Gdx.graphics.getWidth());

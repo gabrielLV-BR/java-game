@@ -12,11 +12,13 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class Door extends GameObject {
 
-    btRigidBody body;
+    private btRigidBody body;
+    private float time; 
 
-    boolean usingShape = false;
+    private final float FINAL_TIME;
+    private boolean isOpening;
 
-    float time = 0;
+    private final Vector3 closedPosition, openedPosition;
 
     public Door(Vector3 p, float scale) {
         super(Assets.<SceneAsset>Get("door.glb").scene, p);
@@ -30,6 +32,24 @@ public class Door extends GameObject {
         body = new btRigidBody(mass, null, boxShape, Vector3.Zero);
         body.translate(p);
         body.userData = this;
+
+        float halfWidth = bb.getHeight() / 2;
+
+        closedPosition = p.cpy();
+        openedPosition = p.cpy().add(0, halfWidth * 2, 0);
+
+        FINAL_TIME = 1;
+        open(5);
+    }
+
+    public void open(float margin) {
+        isOpening = true;
+        time = -margin;
+    }
+
+    public void close(float margin) {
+        isOpening = false;
+        time = -margin;
     }
 
     @Override
@@ -45,41 +65,32 @@ public class Door extends GameObject {
 
     @Override
     public void update(GameState state) {
+        if(time >= FINAL_TIME) {
+            return;
+        }
+
         time += state.delta;
 
-        if(time > 4) {
-            body.setWorldTransform(new Matrix4().translate(body.getCenterOfMassPosition().add(new Vector3(0, 0.7f, 0))));
-        } 
-        if (time > 8) {
-            state.removeGameObject(this);
-            state.physicsWorld.removeBody(body);
-        }
+        if(time < 0) return;
+
+        float norm_time = time / FINAL_TIME;
+        float y = 0;
+
+        if(!isOpening) {
+            norm_time = 1 - norm_time;
+        }          
+
+        y = closedPosition.y + (openedPosition.y - closedPosition.y) * norm_time;
+
+        System.out.println("Y: " + y);
+
+        body.setWorldTransform(
+            new Matrix4().setToTranslation(
+                body.getCenterOfMassPosition().x,
+                y,
+                body.getCenterOfMassPosition().z
+            )
+        );
         body.getWorldTransform(scene.modelInstance.transform);
-        // body.getWorldTransform(scene.modelInstance.transform);
     }
 }
-
-/*
- * 
- * for(int collisionShapeIndex : collisionShapesIndexes) {
- * 
- * Node node = scene.modelInstance.nodes.get(collisionShapeIndex);
- * btCollisionShape childShape = Bullet.obtainStaticNodeShape(
- * node, false
- * );
- * 
- * System.out.print("Child shape #" + collisionShapeIndex + "is ");
- * System.out.println(childShape.isConvex() ? "convex (GOOD)" :
- * "concave (BAD)");
- * compoundShape.addChildShape(node.localTransform.scl(size), childShape);
- * scene.modelInstance.nodes.removeIndex(collisionShapeIndex);
- * }
- * 
- * shape = compoundShape;
- * 
- * System.out.println("Shape is compound with " +
- * compoundShape.getNumChildShapes()
- * + " children");
- * }
- * 
- */

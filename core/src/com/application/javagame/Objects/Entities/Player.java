@@ -61,7 +61,7 @@ public class Player extends GameObject {
         body.setAngularFactor(0);
         body.translate(position);
 
-        weapon = new Handgun();
+        weapon = new Shotgun();
 
         MAX_JETPACK_FUEL = 0.6f;
         jetpackFuel = MAX_JETPACK_FUEL;

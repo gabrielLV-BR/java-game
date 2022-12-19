@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.CollisionObjectWrapper;
-import com.badlogic.gdx.physics.bullet.collision.ContactResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionAlgorithm;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;

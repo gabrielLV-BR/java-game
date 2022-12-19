@@ -22,7 +22,7 @@ public class Handgun extends Weapon {
     public Handgun() {
         super(
             "Handgun", 
-            2, 0.5f, 8,
+            2, 0.3f, 8,
             true
         );
 
