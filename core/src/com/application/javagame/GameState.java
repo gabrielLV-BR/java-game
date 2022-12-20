@@ -193,6 +193,7 @@ public class GameState implements Disposable {
         survivedRounds++;
         timeLeft = ROUND_TIME;
         map.ready();
+        enemySpawner.populate(this, 5 + survivedRounds);
 
         for(GameObject object : gameObjects) {
             if(object instanceof Enemy)
@@ -248,8 +249,8 @@ public class GameState implements Disposable {
             object.update(this);
         }
 
-        enemySpawner.update(this);
-        System.out.println("Inimigos: " + getRemainingEnemies());
+        // enemySpawner.update(this);
+        // System.out.println("Inimigos: " + getRemainingEnemies());
     }
 
     public void render() {
@@ -367,6 +368,6 @@ public class GameState implements Disposable {
 
     public void setMap(Map map) {
         this.map = map;
-        enemySpawner.setSpawnpoints(map.spawnPoints.subList(2, map.spawnPoints.size() -1));
+        enemySpawner.setSpawnpoints(map.spawnPoints.subList(1, map.spawnPoints.size() - 1));
     }
 }

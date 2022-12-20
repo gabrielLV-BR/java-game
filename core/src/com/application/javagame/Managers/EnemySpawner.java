@@ -26,6 +26,28 @@ public class EnemySpawner {
         positions.addAll(list);
     }
 
+    public void populate(GameState state, int num) {
+        num = num - state.getRemainingEnemies();
+
+        for(; num > 0; num--) {
+            Vector3 p = positions.get(MathUtils.random(0, positions.size() - 1));
+
+            int r = MathUtils.random(0, 1);
+            switch (r) {
+                case 1: {
+                    Crawler c = new Crawler(p);
+                    c.register(state);
+                    break;
+                }
+                case 2: {
+                    Vesper v = new Vesper(p);
+                    v.register(state);
+                    break;
+                }
+            }
+        }
+    }
+
     public void update(GameState state) {
         timer -= state.delta;
         if(timer <= 0) {
@@ -35,6 +57,7 @@ public class EnemySpawner {
             Utils3D.printVector3("OMG! spawned at ", p);
         
            int r = MathUtils.random(0, 1);
+           r = 2;
            switch(r) {
             case 1: {
                 Crawler c = new Crawler(p);

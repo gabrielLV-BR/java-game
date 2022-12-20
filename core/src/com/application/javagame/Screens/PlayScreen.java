@@ -25,13 +25,6 @@ public class PlayScreen extends ScreenAdapter {
 
         new Player(state.getMap().spawnPoints.get(0))
             .register(state);
-
-        // Loading level
-        new Crawler(new Vector3(10, 20, 0))
-            .register(state);
-        
-        new Vesper(new Vector3(20, 10, 0))
-            .register(state);
     }
 
     @Override
