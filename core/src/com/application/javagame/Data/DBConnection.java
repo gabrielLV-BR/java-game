@@ -12,6 +12,9 @@ import com.application.javagame.GameState;
 
 public class DBConnection {
     
+    private final String CONNECTION_STRING =
+        "jdbc:sqlite:data.db";
+
     private final String INSERT_SCORE = 
         "INSERT INTO scores (score, name) VALUES(?, ?);";
 
@@ -25,25 +28,16 @@ public class DBConnection {
             "name CHAR(5)" +
         ")";
 
-    public DBConnection() {
+    public DBConnection() throws ClassNotFoundException {
         createDatabase();
     }
 
-    private Connection openConnection() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            return DriverManager.getConnection("jdbc::sqlite:data.db");
-        } catch(ClassNotFoundException e) {
-            System.out.println("Could not find org.sqlite.JDBC");
-            e.printStackTrace();
-        } catch(SQLException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
+    private Connection openConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("org.sqlite.JDBC");
+        return DriverManager.getConnection(CONNECTION_STRING);
     }
-
-    private void createDatabase() {
+    
+    private void createDatabase() throws ClassNotFoundException {
         try(
             Connection c = openConnection()
         ) {
@@ -54,11 +48,12 @@ public class DBConnection {
         }
     }
 
-    public void insertScore(Score score) {
+    public void insertScore(Score score) throws ClassNotFoundException {
         try(
             Connection c = openConnection()
         ) {
             PreparedStatement statement = c.prepareStatement(INSERT_SCORE);
+            System.out.println("Inserting score: " + score.name + ": " + score.score);
             statement.setInt(1, score.score);
             statement.setString(2, score.name);
             statement.execute();
@@ -68,7 +63,13 @@ public class DBConnection {
         }
     }
 
-    public void printScores() {
+    public void saveState(GameState state) {        
+
+    }
+
+    public ArrayList<Score> getScores() throws ClassNotFoundException, SQLException {
+        ArrayList<Score> scores = new ArrayList<>();
+
         try(
             Connection c = openConnection()
         ) {
@@ -79,22 +80,12 @@ public class DBConnection {
                 int score = result.getInt("score");
                 String name = result.getString("name");
 
-                System.out.println(name + " scored " + score + " points");
+                scores.add(new Score(name, score));
             }
 
         } catch(SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public void saveState(GameState state) {        
-
-    }
-
-    public ArrayList<Score> getScores() {
-        ArrayList<Score> scores = new ArrayList<>();
-
-        
 
         return scores;
     }

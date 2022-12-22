@@ -10,6 +10,8 @@ import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Objects.Map;
 import com.application.javagame.Objects.Entities.Player;
 import com.application.javagame.Objects.Entities.Enemies.Enemy;
+import com.application.javagame.Screens.DeathScreen;
+import com.application.javagame.Utils.Utils3D;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -72,6 +74,7 @@ public class GameState implements Disposable {
     private final float ROUND_TIME;
 
     private Map map;
+    private int tries;
 
     private Sprite crosshair;
     private BitmapFont doomFont, doomFontBig;
@@ -86,6 +89,7 @@ public class GameState implements Disposable {
         timeLeft = ROUND_TIME;
         restarting = false;
 
+        tries = 3;
         delta = 0;
         physicsWorld = new PhysicsWorld();
         decalBatch = new DecalBatch(new SimpleOrthoGroupStrategy());
@@ -193,12 +197,13 @@ public class GameState implements Disposable {
         survivedRounds++;
         timeLeft = ROUND_TIME;
         map.ready();
-        enemySpawner.populate(this, 5 + survivedRounds);
 
         for(GameObject object : gameObjects) {
             if(object instanceof Enemy)
              ((Enemy) object).die(this);
         }
+
+        enemySpawner.populate(this, 5 + survivedRounds);
     }
 
     public void addGameObject(GameObject object) {
@@ -242,6 +247,13 @@ public class GameState implements Disposable {
         statusMessage = "" + (int) timeLeft; 
 
         if(timeLeft <= 0.01f) {
+            if(getRemainingEnemies() > 0) {
+                tries--;
+            }
+            if(tries <= 0) {
+                game.setScreen(new DeathScreen(this));
+                return;
+            } 
             handleRestart();
         } 
 
@@ -278,7 +290,7 @@ public class GameState implements Disposable {
 
         spriteBatch.end();
 
-        // physicsWorld.debug_render(sceneManager.camera);
+        physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void resize(int width, int height) {
@@ -369,5 +381,8 @@ public class GameState implements Disposable {
     public void setMap(Map map) {
         this.map = map;
         enemySpawner.setSpawnpoints(map.spawnPoints.subList(1, map.spawnPoints.size() - 1));
+        for (Vector3 p : map.spawnPoints) {
+            Utils3D.printVector3("Spawnpoint: ", p);    
+        }
     }
 }

@@ -2,8 +2,10 @@ package com.application.javagame;
 
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
+import com.application.javagame.Screens.DeathScreen;
 import com.application.javagame.Screens.MenuScreen;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
 public class MyGame extends Game {
@@ -18,7 +20,7 @@ public class MyGame extends Game {
 		// carrega a tela principal
 		GameState state = new GameState(this);
 		// PlayScreen tela = new PlayScreen(state);
-		MenuScreen tela = new MenuScreen(state);
+		Screen tela = new DeathScreen(state);
 		setScreen(tela);
 	}
 

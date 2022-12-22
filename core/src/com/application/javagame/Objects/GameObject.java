@@ -3,11 +3,13 @@ package com.application.javagame.Objects;
 import java.util.ArrayList;
 
 import com.application.javagame.GameState;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.math.Vector3;
 
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.utils.Disposable;
 import net.mgsx.gltf.scene3d.scene.Scene;
@@ -18,10 +20,14 @@ public abstract class GameObject implements Disposable {
     protected Scene scene;
     protected Vector3 tmpVector;
 
+    private boolean isColliding;
+    private btCollisionObject collidingObject;
+
     protected GameObject(SceneModel sceneModel, Vector3 p) {
         tmpVector = new Vector3();
         scene = new Scene(sceneModel);
         scene.modelInstance.transform.setTranslation(p);
+        isColliding = false;
         // collisionObject = new btCollisionObject();
         // collisionObject.setCollisionShape(new btSphereShape(1));
     }
@@ -29,8 +35,22 @@ public abstract class GameObject implements Disposable {
     protected GameObject() {
         tmpVector = new Vector3();
         scene = null;
+        isColliding = false;
         // collisionObject = new btCollisionObject();
         // collisionObject.setCollisionShape(new btSphereShape(1));
+    }
+
+    public void collideWith(btCollisionObject obj) {
+        isColliding = true;
+        collidingObject = obj;
+    }
+
+    protected boolean isColliding() {
+        return isColliding;
+    }
+
+    protected btCollisionObject getCollidedObject() {
+        return collidingObject;
     }
 
     public Scene getScene() {

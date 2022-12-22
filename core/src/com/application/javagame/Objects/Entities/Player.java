@@ -4,17 +4,14 @@ import com.application.javagame.GameState;
 import com.application.javagame.Globals.Actions;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
-import com.application.javagame.Objects.Weapons.Handgun;
 import com.application.javagame.Objects.Weapons.Shotgun;
 import com.application.javagame.Objects.Weapons.Weapon;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.ai.steer.limiters.FullLimiter;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
@@ -35,6 +32,8 @@ public class Player extends GameObject {
     final float MAX_JETPACK_FUEL;
     float jetpackFuel;
 
+    private float life;
+
     public Player(Vector3 position) {
         super();
         camera = new PerspectiveCamera(75, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -42,6 +41,8 @@ public class Player extends GameObject {
         camera.lookAt(0f, 0f, 0f);
         camera.near = 0.1f;
         camera.far = 100000f;
+
+        life = 30;
 
         acceleration = new Vector3(0, 0, 0);
 
@@ -95,6 +96,8 @@ public class Player extends GameObject {
     public void update(GameState state) {
         rotateCamera();
 
+        if(isDead()) return;
+
         move(state.delta);
         
         if(weapon.IS_SINGLE_ACTION) {
@@ -104,6 +107,10 @@ public class Player extends GameObject {
         }
         weapon.update(state);
         camera.position.set(body.getCenterOfMassPosition());
+    }
+
+    public void hurt(float damage) {
+        life -= damage;
     }
 
     private void move(float delta) {
@@ -138,6 +145,10 @@ public class Player extends GameObject {
             if(jetpackFuel > MAX_JETPACK_FUEL) jetpackFuel = MAX_JETPACK_FUEL;
         }
 
+    }
+
+    public boolean isDead() {
+        return life <= 0;
     }
 
     /*

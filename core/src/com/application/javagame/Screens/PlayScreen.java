@@ -25,6 +25,8 @@ public class PlayScreen extends ScreenAdapter {
 
         new Player(state.getMap().spawnPoints.get(0))
             .register(state);
+
+        s.newRound();
     }
 
     @Override

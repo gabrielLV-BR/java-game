@@ -21,6 +21,8 @@ public class InputManager implements Disposable, InputProcessor {
     private final Vector2 prevMousePosition;
     private boolean mouseMoved = false;
 
+    private int lastKey;
+
     private static InputManager inputManager;
 
     private InputManager() {
@@ -70,6 +72,8 @@ public class InputManager implements Disposable, InputProcessor {
     // Teclado/Mouse
     @Override
     public boolean keyDown(int keycode) {
+        lastKey = keycode;
+
         if(keycode == Input.Keys.ESCAPE) {
             Gdx.input.setCursorCatched(false);
         }
@@ -78,6 +82,11 @@ public class InputManager implements Disposable, InputProcessor {
             inputMap.put(keycode, 1f);
 
         return false;
+    }
+    public int getLastKey() {
+        int t = lastKey;
+        lastKey = -1;
+        return t;
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.application.javagame.Data;
 
 public class Score {
-    public final String name;
-    public final Integer score;
+    public String name;
+    public int score;
 
-    public Score(String name, Integer score) {
+    public Score(String name, int score) {
         this.name = name;
         this.score = score;
     }

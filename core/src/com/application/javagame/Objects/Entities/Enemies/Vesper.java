@@ -21,7 +21,7 @@ public class Vesper extends Enemy {
     public Vesper(Vector3 p) {
         super(NAME, Assets.<SceneAsset>Get("vesper.glb").scene, p, LIFE, DAMAGE, 2);
 
-        speed = 20;
+        speed = 50;
 
         BoundingBox bb = new BoundingBox();
         scene.modelInstance.calculateBoundingBox(bb);
@@ -65,6 +65,13 @@ public class Vesper extends Enemy {
         scene.modelInstance.transform
             .setToLookAt(state.getPlayer().getPosition(), Vector3.Y)
             .setTranslation(body.getCenterOfMassPosition());
+
+        state.physicsWorld.performCollisionCheck(body, state.getPlayer().getBody());
+
+        if(isColliding()) {
+            System.out.println("COLISÃO!");
+        }
+            
     }
 
     @Override

@@ -20,7 +20,7 @@ public class Crawler extends Enemy {
     public Crawler(Vector3 p) {
         super(NAME, Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE, 10);
 
-        speed = 20;
+        speed = 2;
 
         BoundingBox bb = new BoundingBox();
         scene.modelInstance.calculateBoundingBox(bb);
@@ -55,7 +55,9 @@ public class Crawler extends Enemy {
 
         tmpVector.set(dir).scl(speed * 10);
         tmpVector.y = body.getLinearVelocity().y;
+
         body.setLinearVelocity(tmpVector);
+        // body.applyCentralImpulse(tmpVector);
 
         scene.modelInstance.transform
             .setToLookAt(state.getPlayer().getPosition(), Vector3.Y)

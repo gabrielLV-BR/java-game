@@ -82,8 +82,6 @@ public class Door extends GameObject {
 
         y = closedPosition.y + (openedPosition.y - closedPosition.y) * norm_time;
 
-        System.out.println("Y: " + y);
-
         body.setWorldTransform(
             new Matrix4().setToTranslation(
                 body.getCenterOfMassPosition().x,
