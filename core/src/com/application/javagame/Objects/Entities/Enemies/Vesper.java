@@ -25,7 +25,7 @@ public class Vesper extends Enemy {
 
         BoundingBox bb = new BoundingBox();
         scene.modelInstance.calculateBoundingBox(bb);
-        btCollisionShape shape = new btSphereShape(bb.getDimensions(tmpVector).scl(0.5f).x);
+        btCollisionShape shape = new btSphereShape(bb.getDimensions(tmpVector).scl(0.5f).y);
 
         float mass = 10f;
         Vector3 inertia = Vector3.Zero;
@@ -66,11 +66,7 @@ public class Vesper extends Enemy {
             .setToLookAt(state.getPlayer().getPosition(), Vector3.Y)
             .setTranslation(body.getCenterOfMassPosition());
 
-        state.physicsWorld.performCollisionCheck(body, state.getPlayer().getBody());
-
-        if(isColliding()) {
-            System.out.println("COLISÃO!");
-        }
+        // state.physicsWorld.performCollisionCheck(body, state.getPlayer().getBody());
             
     }
 

@@ -24,9 +24,9 @@ public class Crawler extends Enemy {
 
         BoundingBox bb = new BoundingBox();
         scene.modelInstance.calculateBoundingBox(bb);
-        btCollisionShape shape = new btBoxShape(bb.getDimensions(tmpVector).scl(0.5f));
+        btCollisionShape shape = new btBoxShape(bb.getDimensions(tmpVector));
 
-        float mass = 10f;
+        float mass = 90f;
         Vector3 inertia = Vector3.Zero;
         shape.calculateLocalInertia(mass, inertia);
 
@@ -53,10 +53,14 @@ public class Crawler extends Enemy {
             .sub(body.getCenterOfMassPosition())
             .nor();
 
-        tmpVector.set(dir).scl(speed * 10);
-        tmpVector.y = body.getLinearVelocity().y;
+        if(body.getLinearVelocity().len() < speed) {
+            body.applyCentralImpulse(tmpVector.set(dir).scl(speed));
+        }
 
+        tmpVector.set(body.getLinearVelocity());
+        tmpVector.y = 0;
         body.setLinearVelocity(tmpVector);
+        // body.setLinearVelocity(tmpVector);
         // body.applyCentralImpulse(tmpVector);
 
         scene.modelInstance.transform

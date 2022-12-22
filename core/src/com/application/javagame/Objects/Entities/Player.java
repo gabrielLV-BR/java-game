@@ -4,12 +4,15 @@ import com.application.javagame.GameState;
 import com.application.javagame.Globals.Actions;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
+import com.application.javagame.Objects.Weapons.Handgun;
+import com.application.javagame.Objects.Weapons.Machinegun;
 import com.application.javagame.Objects.Weapons.Shotgun;
 import com.application.javagame.Objects.Weapons.Weapon;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
@@ -62,10 +65,25 @@ public class Player extends GameObject {
         body.setAngularFactor(0);
         body.translate(position);
 
-        weapon = new Shotgun();
+        weapon = new Machinegun();
 
         MAX_JETPACK_FUEL = 0.6f;
         jetpackFuel = MAX_JETPACK_FUEL;
+    }
+
+    public void randomizeWeapon() {
+        int r = MathUtils.random(0, 1);
+
+        switch(r) {
+            case 1: {
+                weapon = new Handgun();
+                break;
+            }
+            case 2: {
+                weapon = new Shotgun();
+                break;
+            }
+        }
     }
 
     @Override

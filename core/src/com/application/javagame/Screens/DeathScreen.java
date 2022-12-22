@@ -53,6 +53,8 @@ public class DeathScreen extends ScreenAdapter {
     int i = 0;
     final int NAME_SIZE = 7;
 
+    int screen = 0;
+
     public DeathScreen(GameState s) {
         state = s;
         i = 0;
@@ -146,6 +148,23 @@ public class DeathScreen extends ScreenAdapter {
 
     }
 
+    public void thirdScreen() {
+        stage.clear();
+
+        VerticalGroup v = new VerticalGroup();
+        v.setWidth(Gdx.graphics.getWidth());
+        v.setHeight(Gdx.graphics.getHeight());
+
+        Label l1 = new Label("Tentar de novo?", white);
+        Label l2 = new Label("Vidas: " + state.getTries(), white);
+        Label l3 = new Label("(S/N)", red);
+
+        stage.addActor(v);
+        v.center().addActor(l1);
+        v.center().addActor(l2);
+        v.center().addActor(l3);
+    }
+
     @Override
     public void render(float delta) {
         Gdx.input.setCursorCatched(false);
@@ -153,10 +172,12 @@ public class DeathScreen extends ScreenAdapter {
 
         if(timer > 0) {
             timer -= delta;
-        } else if (timer <= 0 && timer > -1000) {
-            timer = -999999;
+        } else if(timer <= 0 && screen == 0) {
+            screen = 1;
             secondScreen();
-        } else {
+        } 
+        
+        if(screen == 1) {
             // for(Label l : nameLabels) l.setStyle(red);
             int k = inputManager.getLastKey();
             if(k != -1) {
@@ -169,11 +190,11 @@ public class DeathScreen extends ScreenAdapter {
                         String name = nameLabel.getText().toString();
                         System.out.println(name);
                         dbConnection.insertScore(new Score(name, state.getPoints()));
-                        state.game.setScreen(new MenuScreen(state));
-                        return;
                     } catch ( Exception e ) {
                         e.printStackTrace();
                     }
+                    screen = 2;
+                    thirdScreen();
                 } else if (k == Keys.BACKSPACE && nameLabel.getText().length > 0) {
                     int size = nameLabel.getText().length;
                     StringBuilder n = new StringBuilder(nameLabel.getText());
@@ -189,6 +210,14 @@ public class DeathScreen extends ScreenAdapter {
     
             }
             // nameLabels[(i + 1) % nameLabels.length].setStyle(white);
+        } else if (screen == 2) {
+            int k = inputManager.getLastKey();
+            if(k == Keys.S && state.getTries() > 0) {
+                state.game.setScreen(new PlayScreen(state));
+            } else if (k == Keys.N) {
+                state.reset();
+                state.game.setScreen(new MenuScreen(state));
+            }
         }
 
         // nameLabel.setText(nameLabel.getText().toString());

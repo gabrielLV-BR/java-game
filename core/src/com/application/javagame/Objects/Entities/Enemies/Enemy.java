@@ -39,6 +39,7 @@ public abstract class Enemy extends GameObject {
         state.addGameObject(
             new Explosion(body.getCenterOfMassPosition(), 0.5f)
         );
+        state.enemyDied();
         state.addPoints(POINTS);
         state.removeGameObject(this);
         state.physicsWorld.removeBody(body);

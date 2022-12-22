@@ -33,7 +33,9 @@ public class MenuScreen extends ScreenAdapter {
         "VOCÊ CAIU NO INFERNO",
         "VOCÊ SÓ TEM A SI MESMO",
         "E ARMAS PODEROSAS",
-        "SOBREVIVA",
+        "MATE TODOS OS DEMÔNIOS",
+        "ANTES DO TEMPO ACABAR",
+        "VÁ!",
         ""
     };
 

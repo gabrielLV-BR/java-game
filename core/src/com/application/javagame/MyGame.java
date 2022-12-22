@@ -20,7 +20,7 @@ public class MyGame extends Game {
 		// carrega a tela principal
 		GameState state = new GameState(this);
 		// PlayScreen tela = new PlayScreen(state);
-		Screen tela = new DeathScreen(state);
+		Screen tela = new MenuScreen(state);
 		setScreen(tela);
 	}
 

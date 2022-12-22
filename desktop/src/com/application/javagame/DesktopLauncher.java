@@ -8,14 +8,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		try {
-			GraphGenerator g = new GraphGenerator();
-			System.out.println("GRAPH = " + g.GenerateGraph());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		System.out.println("--------");
-		
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("Jogo Java");

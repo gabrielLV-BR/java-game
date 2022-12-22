@@ -75,22 +75,26 @@ public class GameState implements Disposable {
 
     private Map map;
     private int tries;
+    private int target;
 
     private Sprite crosshair;
     private BitmapFont doomFont, doomFontBig;
 
     private EnemySpawner enemySpawner;
 
+    private final int TARGET = 1;
+
     public GameState(Game g) {
         points = 0;
         survivedRounds = 0;
 
-        ROUND_TIME = 15;
+        ROUND_TIME = 60;
         timeLeft = ROUND_TIME;
         restarting = false;
 
         tries = 3;
         delta = 0;
+        target = TARGET;
         physicsWorld = new PhysicsWorld();
         decalBatch = new DecalBatch(new SimpleOrthoGroupStrategy());
         spriteBatch = new SpriteBatch();
@@ -168,6 +172,11 @@ public class GameState implements Disposable {
         sceneManager.updateViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
+    public void enemyDied() {
+        if(target > 0) target--;
+        enemySpawner.spawnAnother(this);
+    }
+
     private void setupIBL() {
         DirectionalLightEx light = new DirectionalLightEx();
         light.set(Color.BLACK, new Vector3(1, -1, 0).nor());
@@ -194,16 +203,22 @@ public class GameState implements Disposable {
     }
 
     public void newRound() {
-        survivedRounds++;
-        timeLeft = ROUND_TIME;
-        map.ready();
+        int p = points;
 
         for(GameObject object : gameObjects) {
             if(object instanceof Enemy)
              ((Enemy) object).die(this);
         }
 
-        enemySpawner.populate(this, 5 + survivedRounds);
+        points = p;
+        survivedRounds++;
+        timeLeft = ROUND_TIME;
+        target = Math.abs(TARGET + survivedRounds);
+        map.ready();
+
+        // player.randomizeWeapon();
+        
+        enemySpawner.populate(this, (int)(target * 1.5));
     }
 
     public void addGameObject(GameObject object) {
@@ -246,14 +261,11 @@ public class GameState implements Disposable {
         
         statusMessage = "" + (int) timeLeft; 
 
-        if(timeLeft <= 0.01f) {
-            if(getRemainingEnemies() > 0) {
-                tries--;
-            }
-            if(tries <= 0) {
-                game.setScreen(new DeathScreen(this));
-                return;
-            } 
+        if(timeLeft <= 0 && target > 0) {
+            tries--;
+            game.setScreen(new DeathScreen(this));
+            return;
+        } else if (target <= 0) {
             handleRestart();
         } 
 
@@ -261,7 +273,7 @@ public class GameState implements Disposable {
             object.update(this);
         }
 
-        // enemySpawner.update(this);
+        enemySpawner.update(this);
         // System.out.println("Inimigos: " + getRemainingEnemies());
     }
 
@@ -280,22 +292,46 @@ public class GameState implements Disposable {
 
         doomFont.draw(spriteBatch, "POINTS: " + getPoints(), 10, Gdx.graphics.getHeight() - 20);
 
-        doomFontBig.draw(
-            spriteBatch, 
-            statusMessage, 
-            Gdx.graphics.getWidth() / 2 - (statusMessage.length() * 10),
-
-            Gdx.graphics.getHeight() - 20
-        );
+        if(!restarting) {
+            doomFontBig.draw(
+                spriteBatch, 
+                statusMessage, 
+                Gdx.graphics.getWidth() / 2 - (statusMessage.length() * 10),
+                Gdx.graphics.getHeight() - 20
+            );
+            doomFont.draw(
+                spriteBatch, 
+                "" + target, 
+                Gdx.graphics.getWidth() - 20,
+                20
+            );
+        }
 
         spriteBatch.end();
 
         physicsWorld.debug_render(sceneManager.camera);
     }
 
+    public void reset() {
+        points = 0;
+        survivedRounds = 0;
+        timeLeft = ROUND_TIME;
+        restarting = false;
+        tries = 3;
+        delta = 0;
+        target = 5;
+        gameObjects.clear();
+        gameObjectsToAdd.clear();
+        gameObjectsToRemove.clear();
+    }
+
     public void resize(int width, int height) {
         updateCrosshairPosition();
         sceneManager.updateViewport(width, height);
+    }
+
+    public int getTries() {
+        return tries;
     }
 
     private void preloadAssets() {
@@ -308,9 +344,11 @@ public class GameState implements Disposable {
         manager.load("map2.glb", SceneAsset.class);
         manager.load("crawler.glb", SceneAsset.class);
         manager.load("vesper.glb", SceneAsset.class);
+        manager.load("vesper2.glb", SceneAsset.class);
         manager.load("door.glb", SceneAsset.class);
         manager.load("guns/handgun.png", Texture.class);
         manager.load("guns/shotgun.png", Texture.class);
+        manager.load("guns/machinegun.png", Texture.class);
 
         manager.load("crosshair.png", Texture.class);
         manager.load("hole.png", Texture.class);
@@ -336,9 +374,8 @@ public class GameState implements Disposable {
             } else {
                 statusMessage = "VOLTE PRO ELEVADOR";
             }
-        } else {
+        } else if (restarting && timeLeft <= 0) {
             restarting = false;
-            statusMessage = "GO!";
             newRound();
         } 
     }
