@@ -18,7 +18,8 @@ public class Handgun extends Weapon {
 
     Sound fireSound, reloadSound;
     Vector3 weaponOffset;
-    static Texture txt = Assets.Get("explosion.png");;
+    static Texture txt = Assets.Get("explosion.png");
+
     public Handgun() {
         super(
             "Handgun", 
@@ -30,8 +31,10 @@ public class Handgun extends Weapon {
         fireSound = Assets.Get("sounds/pistol.mp3");
         reloadSound = Assets.Get("sounds/pistol_reload.mp3");
 
-        Texture handgunSprites = Assets.Get("guns/handgun.png");
-        TextureRegion[][] regions = TextureRegion.split(handgunSprites, 80, 119);
+        // texture = Assets.Get("guns/handgun.png");
+        texture = new Texture(Gdx.files.internal("guns/handgun.png"));
+        regions = TextureRegion.split(texture, 80, 119);
+        System.out.println(texture);
 
         weaponOffset = new Vector3(0, 0, 0);
 

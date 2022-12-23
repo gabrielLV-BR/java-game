@@ -1,12 +1,12 @@
 package com.application.javagame.Screens;
 
-import java.security.Key;
 import java.util.HashMap;
 
-import javax.swing.plaf.metal.MetalBorders.TableHeaderBorder;
+import javax.swing.text.html.ImageView;
 
 import com.application.javagame.GameState;
 import com.application.javagame.Data.DBConnection;
+import com.application.javagame.Data.GraphGenerator;
 import com.application.javagame.Data.Score;
 import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
@@ -21,11 +21,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -39,6 +36,8 @@ public class DeathScreen extends ScreenAdapter {
 
     InputManager inputManager;
 
+    Sound death;
+
     Stage stage;
     FitViewport viewport;
     OrthographicCamera camera;
@@ -48,7 +47,7 @@ public class DeathScreen extends ScreenAdapter {
     Label nameLabel;
 
     LabelStyle red, white;
-    float timer = 3;
+    float timer = 5;
 
     int i = 0;
     final int NAME_SIZE = 7;
@@ -58,6 +57,10 @@ public class DeathScreen extends ScreenAdapter {
     public DeathScreen(GameState s) {
         state = s;
         i = 0;
+
+        death = Assets.Get("sounds/bell.mp3");
+        death.play();
+
 
         // letters = new char[5];
         // for(int i = 0; i < letters.length; i++)
@@ -190,6 +193,8 @@ public class DeathScreen extends ScreenAdapter {
                         String name = nameLabel.getText().toString();
                         System.out.println(name);
                         dbConnection.insertScore(new Score(name, state.getPoints()));
+                        GraphGenerator g = new GraphGenerator();
+                        g.GenerateGraph();
                     } catch ( Exception e ) {
                         e.printStackTrace();
                     }
@@ -214,10 +219,20 @@ public class DeathScreen extends ScreenAdapter {
             int k = inputManager.getLastKey();
             if(k == Keys.S && state.getTries() > 0) {
                 state.game.setScreen(new PlayScreen(state));
+                return;
             } else if (k == Keys.N) {
-                state.reset();
-                state.game.setScreen(new MenuScreen(state));
+                screen = 3;
             }
+        } else if (screen == 3) {
+            stage.clear();
+            Image image = new Image(new Texture(Gdx.files.local("graph.png")));
+            image.setWidth(Gdx.graphics.getWidth());
+            image.setHeight(Gdx.graphics.getHeight());
+            stage.addActor(image);
+            if(inputManager.getLastKey() == Keys.ENTER) screen = 4;
+        } else if (screen == 4) {
+            state.reset();
+            state.game.setScreen(new MenuScreen(state));
         }
 
         // nameLabel.setText(nameLabel.getText().toString());

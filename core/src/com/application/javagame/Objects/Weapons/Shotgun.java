@@ -29,9 +29,11 @@ public class Shotgun extends Weapon {
         bullets = 3;
         fireSound = Assets.Get("sounds/shotgun.mp3");
 
-        Texture shotgunSprites = Assets.Get("guns/shotgun.png");
-        TextureRegion[][] regions = TextureRegion.split(shotgunSprites, shotgunSprites.getWidth() / 7, 132);
+        // texture = Assets.Get("guns/shotgun.png");
+        texture = new Texture(Gdx.files.internal("guns/shotgun.png"));
+        regions = TextureRegion.split(texture, texture.getWidth() / 7, 132);
 
+        System.out.println(texture);
         System.out.println("Cols: " + regions[0].length);
         System.out.println("Rows: " + regions.length);
 

@@ -1,7 +1,10 @@
 package com.application.javagame.Objects.Entities;
 
+import java.util.ArrayList;
+
 import com.application.javagame.GameState;
 import com.application.javagame.Globals.Actions;
+import com.application.javagame.Managers.Assets;
 import com.application.javagame.Managers.InputManager;
 import com.application.javagame.Objects.GameObject;
 import com.application.javagame.Objects.Weapons.Handgun;
@@ -11,7 +14,9 @@ import com.application.javagame.Objects.Weapons.Weapon;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -33,9 +38,15 @@ public class Player extends GameObject {
     float yaw; // rotação horizontal da câmera
 
     final float MAX_JETPACK_FUEL;
-    float jetpackFuel;
+    float jetpackFuel, cooldown;
 
     private float life;
+
+    Handgun handgun = new Handgun();
+    Shotgun shotgun = new Shotgun();
+    Machinegun machinegun = new Machinegun();
+
+    ArrayList<Sound> dores;
 
     public Player(Vector3 position) {
         super();
@@ -45,7 +56,14 @@ public class Player extends GameObject {
         camera.near = 0.1f;
         camera.far = 100000f;
 
-        life = 30;
+        life = 20;
+        cooldown = 0;
+
+        dores = new ArrayList<>();
+        dores.add(Assets.<Sound>Get("sounds/dor-01.mp3"));
+        dores.add(Assets.<Sound>Get("sounds/dor-02.mp3"));
+        dores.add(Assets.<Sound>Get("sounds/dor-03.mp3"));
+        dores.add(Assets.<Sound>Get("sounds/dor-04.mp3"));
 
         acceleration = new Vector3(0, 0, 0);
 
@@ -65,25 +83,39 @@ public class Player extends GameObject {
         body.setAngularFactor(0);
         body.translate(position);
 
-        weapon = new Machinegun();
+        weapon = new Handgun();
 
         MAX_JETPACK_FUEL = 0.6f;
         jetpackFuel = MAX_JETPACK_FUEL;
     }
 
-    public void randomizeWeapon() {
-        int r = MathUtils.random(0, 1);
+    public int getLife() {
+        return (int)life;
+    }
 
+    public float getNormFuel() {
+        return 1.0f - (jetpackFuel / MAX_JETPACK_FUEL); 
+    }
+
+    public void randomizeWeapon(GameState state) {
+        int r = MathUtils.random(0, 2);
+        state.removeSprite(weapon.getSprite());
+        System.out.println(r);
         switch(r) {
             case 1: {
-                weapon = new Handgun();
+                weapon = handgun;
                 break;
             }
             case 2: {
-                weapon = new Shotgun();
+                weapon = machinegun;
+                break;
+            }
+            case 3: {
+                weapon = shotgun;
                 break;
             }
         }
+        state.addSprite(weapon.getSprite());
     }
 
     @Override
@@ -127,8 +159,10 @@ public class Player extends GameObject {
         camera.position.set(body.getCenterOfMassPosition());
     }
 
-    public void hurt(float damage) {
+    public void hurt(float damage, Vector3 dir) {
         life -= damage;
+        body.applyCentralImpulse(dir.scl(-100));
+        dores.get(MathUtils.random(0, dores.size() - 1)).play();
     }
 
     private void move(float delta) {
@@ -153,14 +187,22 @@ public class Player extends GameObject {
             body.setLinearVelocity(tmpVector.set(0, body.getLinearVelocity().y, 0));
         }
 
-        if(Gdx.input.isKeyPressed(Keys.SPACE) && jetpackFuel > 0) {
+        cooldown -= delta;
+
+        if(Gdx.input.isKeyPressed(Keys.SPACE) && jetpackFuel > 0 && cooldown <= 0.01) {
             // System.out.println("JETPACK");
             body.applyCentralImpulse(tmpVector.set(0, 900, 0));
-            
             jetpackFuel -= delta;
-        } else {
+
+            if(jetpackFuel <= 0f) {
+                cooldown = MAX_JETPACK_FUEL;
+            }
+        } else if (cooldown <= 0) {
             jetpackFuel += delta;
-            if(jetpackFuel > MAX_JETPACK_FUEL) jetpackFuel = MAX_JETPACK_FUEL;
+            if(jetpackFuel > MAX_JETPACK_FUEL) {
+                jetpackFuel = MAX_JETPACK_FUEL;
+                cooldown = 0;
+            };
         }
 
     }

@@ -12,8 +12,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
+import com.badlogic.gdx.utils.Disposable;
 
-public abstract class Weapon {
+public abstract class Weapon implements Disposable {
     public final String NAME;
     public final float DAMAGE;
     public final float MAX_FIRE_TIME;
@@ -23,6 +24,9 @@ public abstract class Weapon {
     protected final Vector3 tmpVector;
 
     private static Texture holeTexture = null;
+
+    protected Texture texture;
+    protected TextureRegion[][] regions;
 
     float time = 0;
 
@@ -74,4 +78,9 @@ public abstract class Weapon {
     }
 
     public void update(GameState state) {}
+
+    @Override
+    public void dispose() {
+        texture.dispose();
+    }
 }

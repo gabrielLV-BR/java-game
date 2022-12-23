@@ -51,12 +51,9 @@ public class GraphGenerator {
             if(s.score > maxValue) maxValue = s.score;
         }
 
-        // não precisamos normalizar
-        if(maxValue <= 100) maxValue = 1;
-
         for(Score s : scores) {
             Color c = colors[i++ % colors.length];    
-            Data d = new Data(Double.valueOf(s.score) / maxValue);
+            Data d = new Data(Double.valueOf(s.score) / maxValue * 100);
             labels.add(s.score);
             Plot plot = Plots.newPlot(d, c, s.name);
             plots.add(plot);

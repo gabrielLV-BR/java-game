@@ -29,6 +29,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.decals.SimpleOrthoGroupStrategy;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.utils.Disposable;
@@ -77,7 +78,7 @@ public class GameState implements Disposable {
     private int tries;
     private int target;
 
-    private Sprite crosshair;
+    private Sprite crosshair, life, medidor, pininho;
     private BitmapFont doomFont, doomFontBig;
 
     private EnemySpawner enemySpawner;
@@ -131,6 +132,13 @@ public class GameState implements Disposable {
         addSprite(crosshair);
         updateCrosshairPosition();
 
+        life = new Sprite(Assets.<Texture>Get("life.png"));
+        medidor = new Sprite(Assets.<Texture>Get("medidor.png"));
+        pininho = new Sprite(Assets.<Texture>Get("pininho.png"));
+        pininho.setOrigin(pininho.getWidth() / 2, 5);
+        medidor.setScale(0.6f);
+        pininho.setScale(0.6f);
+
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/eternal.ttf"));
         FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 
@@ -140,6 +148,9 @@ public class GameState implements Disposable {
         parameter.size = 24;
         parameter.color = new Color(0.8f, 0.1f, 0.2f, 1);
         doomFontBig = generator.generateFont(parameter);
+
+        medidor.setPosition(10, 50);
+        pininho.setPosition(medidor.getX() + medidor.getWidth() / 2, medidor.getY() + 12);
     }
 
     public int getRemainingEnemies() {
@@ -216,7 +227,7 @@ public class GameState implements Disposable {
         target = Math.abs(TARGET + survivedRounds);
         map.ready();
 
-        // player.randomizeWeapon();
+        player.randomizeWeapon(this);
         
         enemySpawner.populate(this, (int)(target * 1.5));
     }
@@ -261,7 +272,7 @@ public class GameState implements Disposable {
         
         statusMessage = "" + (int) timeLeft; 
 
-        if(timeLeft <= 0 && target > 0) {
+        if(player.isDead() || (timeLeft <= 0 && target > 0)) {
             tries--;
             game.setScreen(new DeathScreen(this));
             return;
@@ -307,9 +318,23 @@ public class GameState implements Disposable {
             );
         }
 
+        life.setPosition(10, 10);
+        life.draw(spriteBatch); 
+
+        doomFont.draw(
+            spriteBatch, 
+            "" + player.getLife(), 
+            20 + life.getWidth() + 5,
+            20
+        );
+
+        pininho.setRotation(MathUtils.lerp(-90, 90, player.getNormFuel()));
+        medidor.draw(spriteBatch);
+        pininho.draw(spriteBatch);
+
         spriteBatch.end();
 
-        physicsWorld.debug_render(sceneManager.camera);
+        // physicsWorld.debug_render(sceneManager.camera);
     }
 
     public void reset() {
@@ -320,7 +345,9 @@ public class GameState implements Disposable {
         tries = 3;
         delta = 0;
         target = 5;
+
         gameObjects.clear();
+        spritesToDraw.clear();
         gameObjectsToAdd.clear();
         gameObjectsToRemove.clear();
     }
@@ -356,11 +383,20 @@ public class GameState implements Disposable {
         manager.load("hellrise.png", Texture.class);
         manager.load("hellrise black.png", Texture.class);
         manager.load("white.png", Texture.class);
+        manager.load("medidor.png", Texture.class);
+        manager.load("pininho.png", Texture.class);
+        manager.load("life.png", Texture.class);
+        manager.load("sounds/bell.mp3", Sound.class);
 
         manager.load("sounds/pistol.mp3", Sound.class);
         manager.load("sounds/pistol_reload.mp3", Sound.class);
         manager.load("sounds/shotgun.mp3", Sound.class);
         manager.load("sounds/next.mp3", Sound.class);
+
+        manager.load("sounds/dor-01.mp3", Sound.class);
+        manager.load("sounds/dor-02.mp3", Sound.class);
+        manager.load("sounds/dor-03.mp3", Sound.class);
+        manager.load("sounds/dor-04.mp3", Sound.class);
         // manager.load("fonts/eternal.ttf", BitmapFont.class);
     }
 

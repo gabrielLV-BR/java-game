@@ -16,15 +16,16 @@ public class Crawler extends Enemy {
     private static final float LIFE = 10;
 
     private final float speed;
+    float hasntHit = 0;
 
     public Crawler(Vector3 p) {
         super(NAME, Assets.<SceneAsset>Get("crawler.glb").scene, p, LIFE, DAMAGE, 10);
 
-        speed = 2;
+        speed = 6;
 
         BoundingBox bb = new BoundingBox();
         scene.modelInstance.calculateBoundingBox(bb);
-        btCollisionShape shape = new btBoxShape(bb.getDimensions(tmpVector));
+        btCollisionShape shape = new btBoxShape(new Vector3(3, 7, 3));
 
         float mass = 90f;
         Vector3 inertia = Vector3.Zero;
@@ -51,23 +52,40 @@ public class Crawler extends Enemy {
 
         dir.set(state.getPlayer().getPosition())
             .sub(body.getCenterOfMassPosition())
-            .nor();
+            .nor()
+            .scl(speed);
 
-        if(body.getLinearVelocity().len() < speed) {
-            body.applyCentralImpulse(tmpVector.set(dir).scl(speed));
-        }
+        dir.y = 0;
 
-        tmpVector.set(body.getLinearVelocity());
-        tmpVector.y = 0;
+        body.activate();
+        // body.applyCentralImpulse(tmpVector.set(dir).scl(speed));
+        tmpVector.set(dir).scl(speed);
+        tmpVector.y = body.getLinearVelocity().y;
         body.setLinearVelocity(tmpVector);
+
+        // tmpVector.set(body.getLinearVelocity());
+        // tmpVector.y = 0;
+        // body.setLinearVelocity(tmpVector);
         // body.setLinearVelocity(tmpVector);
         // body.applyCentralImpulse(tmpVector);
 
-        scene.modelInstance.transform
-            .setToLookAt(state.getPlayer().getPosition(), Vector3.Y)
-            .setTranslation(body.getCenterOfMassPosition());
+        body.getWorldTransform(scene.modelInstance.transform);
+        // scene.modelInstance.transform
+        //     .setToLookAt(state.getPlayer().getPosition(), Vector3.Y);
 
         scene.animations.update(state.delta);
+
+
+        Vector3 dir = tmpVector.set(state.getPlayer().getPosition()).sub(body.getCenterOfMassPosition());
+        float player_dist = dir.len();
+        System.out.println(player_dist);
+        if(hasntHit >= 1.2 && player_dist < 10) {
+            body.applyCentralImpulse(dir.cpy().scl(100));
+            state.getPlayer().hurt(DAMAGE, dir);
+            hasntHit = 0;
+        } else {
+            hasntHit += state.delta;
+        }
     }
 
     public btRigidBody getBody() {

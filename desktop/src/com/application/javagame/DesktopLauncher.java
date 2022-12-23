@@ -1,8 +1,5 @@
 package com.application.javagame;
 
-import com.application.javagame.Data.DBConnection;
-import com.application.javagame.Data.GraphGenerator;
-import com.application.javagame.Data.Score;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 

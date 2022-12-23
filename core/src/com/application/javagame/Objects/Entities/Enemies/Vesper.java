@@ -17,11 +17,14 @@ public class Vesper extends Enemy {
     private static final float LIFE = 5;
 
     private final float speed;
+    private float hasntHit;
 
     public Vesper(Vector3 p) {
         super(NAME, Assets.<SceneAsset>Get("vesper.glb").scene, p, LIFE, DAMAGE, 2);
 
         speed = 50;
+
+        hasntHit = 0;
 
         BoundingBox bb = new BoundingBox();
         scene.modelInstance.calculateBoundingBox(bb);
@@ -65,6 +68,16 @@ public class Vesper extends Enemy {
         scene.modelInstance.transform
             .setToLookAt(state.getPlayer().getPosition(), Vector3.Y)
             .setTranslation(body.getCenterOfMassPosition());
+
+        Vector3 dir = tmpVector.set(state.getPlayer().getPosition()).sub(body.getCenterOfMassPosition());
+        float player_dist = dir.len();
+        System.out.println(player_dist);
+        if(hasntHit >= 1.2 && player_dist < 20) {
+            state.getPlayer().hurt(DAMAGE, dir);
+            hasntHit = 0;
+        } else {
+            hasntHit += state.delta;
+        }
 
         // state.physicsWorld.performCollisionCheck(body, state.getPlayer().getBody());
             
